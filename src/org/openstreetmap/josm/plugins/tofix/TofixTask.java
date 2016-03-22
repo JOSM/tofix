@@ -31,7 +31,8 @@ public class TofixTask {
 
     ItemController itemController = new ItemController();
     Bounds bounds = null;
-    DownloadOsmTask downloadOsmTask = new DownloadOsmTask();
+   // DownloadOsmTask downloadOsmTask = new DownloadOsmTask();
+    DownloadOsmTask downloadOsmTask=new DownloadOsmTask();
     Node node = null;
     TofixLayer tofixLayer = new TofixLayer("Tofix-layer");
 

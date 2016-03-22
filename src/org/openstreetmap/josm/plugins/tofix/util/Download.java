@@ -1,5 +1,6 @@
 package org.openstreetmap.josm.plugins.tofix.util;
 
+import java.awt.Component;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -13,7 +14,9 @@ import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.Way;
+import org.openstreetmap.josm.gui.progress.NullProgressMonitor;
 import org.openstreetmap.josm.gui.progress.ProgressMonitor;
+import org.openstreetmap.josm.gui.progress.ProgressTaskId;
 import org.openstreetmap.josm.plugins.tofix.TofixDialog;
 
 /**
@@ -23,9 +26,24 @@ import org.openstreetmap.josm.plugins.tofix.TofixDialog;
 public class Download {
 
     private static Future<?> future;
+    static private boolean  state;
+
+    public Download() {
+    }
+
+    public void state(boolean s) {
+        state = s;
+    }
 
     public static void Download(final DownloadOsmTask task, Bounds bounds, final Long osm_obj_id) {
-        ProgressMonitor monitor = null;
+
+        ProgressMonitor monitor = null;        
+        System.out.println("Esto es la selección de checkbox fuera del if" + state);
+        if (state) {
+            System.out.println("Esto es la selección de checkbox" + state);
+            monitor = NullProgressMonitor.INSTANCE;
+        }
+
         final Future<?> future = task.download(true, bounds, monitor);
         Runnable runAfterTask = new Runnable() {
 

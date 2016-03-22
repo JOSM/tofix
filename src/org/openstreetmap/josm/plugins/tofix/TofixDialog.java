@@ -43,6 +43,9 @@ import org.openstreetmap.josm.plugins.tofix.util.Status;
 import org.openstreetmap.josm.tools.ImageProvider;
 import org.openstreetmap.josm.tools.OpenBrowser;
 import org.openstreetmap.josm.tools.Shortcut;
+import javax.swing.JCheckBox;
+import org.openstreetmap.josm.plugins.tofix.util.Download;
+import org.openstreetmap.josm.plugins.tofix.util.UploadBackground;
 
 /**
  *
@@ -58,6 +61,11 @@ public class TofixDialog extends ToggleDialog implements ActionListener {
     private Shortcut fixedShortcut = null;
     private Shortcut noterrorButtonShortcut = null;
     JSlider slider = new JSlider(JSlider.HORIZONTAL, 1, 5, 1);
+
+    //private final down-up checkbox
+    private JCheckBox jcbdownload = new JCheckBox();
+    private JCheckBox jcbupload = new JCheckBox();
+    Download download=new Download();
 
     //size to download
     double zise = 0.001; //per default
@@ -84,11 +92,15 @@ public class TofixDialog extends ToggleDialog implements ActionListener {
     JPanel jcontenConfig = new JPanel(new GridLayout(2, 1));
     JPanel panelslide = new JPanel(new GridLayout(1, 1));
 
+    JPanel jcontentCheckBox = new JPanel(new GridLayout(2, 1));
+    JPanel panelcheckbox = new JPanel(new GridLayout(1, 1));
+
     JosmUserIdentityManager josmUserIdentityManager = JosmUserIdentityManager.getInstance();
 
     TofixTask tofixTask = new TofixTask();
     //Upload upload = new Upload();
     UploadAction uploadAction = new UploadAction();
+    UploadBackground uploadBackground = new UploadBackground();
 
     public TofixDialog() {
 
@@ -123,7 +135,11 @@ public class TofixDialog extends ToggleDialog implements ActionListener {
             public void actionPerformed(ActionEvent e) {
                 APIDataSet apiData = new APIDataSet(Main.main.getCurrentDataSet());
                 Main.map.mapView.getEditLayer().data.getChangeSetTags().put("comment", setup_comment(mainAccessToTask.getTask_id()));
-                uploadAction.uploadData(Main.map.mapView.getEditLayer(), apiData);
+                if (jcbupload.isSelected()) {
+                   uploadBackground.uploadData(Main.map.mapView.getEditLayer(), apiData, setup_comment(mainAccessToTask.getTask_id()));
+                } else {
+                    uploadAction.uploadData(Main.map.mapView.getEditLayer(), apiData);
+                }
                 if (!UploadDialog.getUploadDialog().isCanceled()) {
                     fixed();
                 }
@@ -198,6 +214,36 @@ public class TofixDialog extends ToggleDialog implements ActionListener {
             panelslide.add(slider);
             jcontenConfig.add(panelslide);
 
+            //Down-Up label
+            jcbdownload = new JCheckBox(new AbstractAction() {
+                {
+                    putValue(NAME, tr("Hide download progress dialog"));
+                    putValue(SHORT_DESCRIPTION, tr("Download in background."));
+                }
+
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    download.state(jcbdownload.isSelected());
+                    System.out.println("esto esta en tofix dialog: " + jcbdownload.isSelected());
+                }
+            });
+
+            jcbupload = new JCheckBox(new AbstractAction() {
+                {
+                    putValue(NAME, tr("Hide upload progress dialog"));
+                    putValue(SHORT_DESCRIPTION, tr("Upload in background."));
+                }
+
+                @Override
+                public void actionPerformed(ActionEvent e) {
+
+                }
+            });
+
+            panelcheckbox.add(jcbdownload);
+            panelcheckbox.add(jcbupload);
+            jcontentCheckBox.add(panelcheckbox);
+
             //PANEL TASKS
             valuePanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
             //jcontenTasks.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -205,6 +251,7 @@ public class TofixDialog extends ToggleDialog implements ActionListener {
 
             TabbedPanel.addTab("Tasks", jcontenTasks);
             TabbedPanel.addTab("Config", jcontenConfig);
+            TabbedPanel.addTab("Hiding", jcontentCheckBox);
 
             //add panels in JOSM
             createLayout(TabbedPanel, false, Arrays.asList(new SideButton[]{
@@ -232,6 +279,9 @@ public class TofixDialog extends ToggleDialog implements ActionListener {
         }
     }
 
+   
+
+ 
     public class Skip_key_Action extends AbstractAction {
 
         @Override
@@ -246,7 +296,12 @@ public class TofixDialog extends ToggleDialog implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             APIDataSet apiData = new APIDataSet(Main.main.getCurrentDataSet());
             Main.map.mapView.getEditLayer().data.getChangeSetTags().put("comment", setup_comment(mainAccessToTask.getTask_id()));
-            uploadAction.uploadData(Main.map.mapView.getEditLayer(), apiData);
+            if (jcbupload.isSelected()) {
+                  uploadBackground.uploadData(Main.map.mapView.getEditLayer(), apiData,setup_comment(mainAccessToTask.getTask_id()));
+               // new UploadBackground();
+                } else {
+                    uploadAction.uploadData(Main.map.mapView.getEditLayer(), apiData);
+                }
             if (!UploadDialog.getUploadDialog().isCanceled()) {
                 fixed();
             }
