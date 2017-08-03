@@ -75,7 +75,7 @@ public class ItemController {
 
                         if (geometry.containsKey("type")) {
                             if (properties.containsKey("_osmId")) {
-                                iop.setWay(Long.parseLong(properties.getJsonNumber("_osmId").toString()));
+                                iop.setWay(convert(properties));
                             }
                             iop.setGeometry(geometry.getJsonString("type").toString());
                             iop.setCoordinates(geometry.get("coordinates").toString());
@@ -89,7 +89,7 @@ public class ItemController {
                         iom.setKey(properties.getString("_key"));
                         if (geometry.containsKey("type")) {
                             if (properties.containsKey("_osmId")) {
-                                iom.setWay(Long.parseLong(properties.getJsonNumber("_osmId").toString()));
+                                iom.setWay(convert(properties));
                             }
                             iom.setGeometry(geometry.getJsonString("type").toString());
                             iom.setCoordinates(geometry.get("coordinates").toString());
@@ -103,7 +103,7 @@ public class ItemController {
                         ItemOsmlintLinestring iol = new ItemOsmlintLinestring();
                         iol.setKey(properties.getString("_key"));
                         if (properties.containsKey("_osmId")) {
-                            iol.setWay(Long.parseLong(properties.getString("_osmId")));
+                            iol.setWay(convert(properties));
                         }
                         if (object.containsKey("geometry")) {
                             iol.setGeometry(geometry.getJsonString("type").toString());
@@ -117,7 +117,7 @@ public class ItemController {
                         ItemOsmlintMultilinestring ioml = new ItemOsmlintMultilinestring();
                         ioml.setKey(properties.getString("_key"));
                         if (properties.containsKey("_osmId")) {
-                            ioml.setWay(Long.parseLong(properties.getString("_osmId")));
+                            ioml.setWay(convert(properties));
                         }
                         if (object.containsKey("geometry")) {
                             ioml.setGeometry(geometry.getJsonString("type").toString());
@@ -131,11 +131,7 @@ public class ItemController {
                         ItemOsmlintPolygon iop = new ItemOsmlintPolygon();
                         iop.setKey(properties.getString("_key"));
                         if (properties.containsKey("_osmId")) {
-                            if (properties.get("_osmId").getValueType().compareTo(JsonValue.ValueType.STRING) == 0) {
-                                iop.setWay(Long.parseLong(properties.getString("_osmId")));
-                            } else {
-                                iop.setWay(Long.parseLong(properties.getJsonNumber("_osmId").toString()));
-                            }
+                            iop.setWay(convert(properties));
                         }
                         if (object.containsKey("geometry")) {
                             iop.setGeometry(geometry.getJsonString("type").toString());
@@ -149,7 +145,7 @@ public class ItemController {
                         ItemOsmlintMultipolygon iomp = new ItemOsmlintMultipolygon();
                         iomp.setKey(properties.getString("_key"));
                         if (properties.containsKey("_osmId")) {
-                            iomp.setWay(Long.parseLong(properties.getString("_osmId")));
+                            iomp.setWay(convert(properties));
                         }
                         if (object.containsKey("geometry")) {
                             iomp.setGeometry(geometry.getJsonString("type").toString());
@@ -178,5 +174,13 @@ public class ItemController {
             Logger.getLogger(ItemController.class.getName()).log(Level.SEVERE, null, ex);
         }
         return item;
+    }
+
+    public Long convert(JsonObject jo) {
+        if (jo.get("_osmId").getValueType().compareTo(JsonValue.ValueType.STRING) == 0) {
+            return Long.parseLong(jo.getString("_osmId"));
+        } else {
+            return Long.parseLong(jo.getJsonNumber("_osmId").toString());
+        }
     }
 }
