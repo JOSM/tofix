@@ -8,6 +8,9 @@
     <property name="plugin.description" value="Integrate to-fix http://osmlab.github.io/to-fix/ into JOSM to repair errors in OpenStreetMap"/>
     <property name="plugin.icon" value="images/icontofix.png"/>
     <property name="plugin.link" value="https://github.com/JOSM/tofix-plugin"/>
+    <property name="plugin.requires" value="geojson"/>
     <property name="plugin.canloadatruntime" value="true"/>
     <import file="../build-common.xml"/>
+    <fileset id="plugin.requires.jars" dir="${plugin.dist.dir}">
+    </fileset>
 </project>

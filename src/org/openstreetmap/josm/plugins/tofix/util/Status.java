@@ -1,9 +1,14 @@
 package org.openstreetmap.josm.plugins.tofix.util;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonReader;
 
-import org.openstreetmap.josm.plugins.tofix.controller.StatusController;
 import org.openstreetmap.josm.tools.HttpClient;
 import org.openstreetmap.josm.tools.Logging;
 
@@ -13,10 +18,16 @@ import org.openstreetmap.josm.tools.Logging;
  */
 public class Status {
 
-    static String host = Config.getHOST();
-
-    public static boolean server() {
-        return "a ok".equals(new StatusController(host).getStatusBean().getStatus());
+    public static boolean serverStatus() {
+        try {
+            String responseString = Request.sendGET(Config.getHOST());
+            JsonReader reader = Json.createReader(new StringReader(responseString));
+            JsonObject statusObject = reader.readObject();
+            return "OK".equals(statusObject.getString("status"));
+        } catch (IOException ex) {
+            Logger.getLogger(Status.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
+        }
     }
 
     public static boolean isInternetReachable() {
