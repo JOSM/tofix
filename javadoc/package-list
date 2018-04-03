@@ -1,0 +1,10 @@
+org.openstreetmap.josm.plugins.tofix
+org.openstreetmap.josm.plugins.tofix.bean
+org.openstreetmap.josm.plugins.tofix.controller
+org.openstreetmap.josm.plugins.tofix.oauth
+org.openstreetmap.josm.plugins.tofix.oauth.signpost
+org.openstreetmap.josm.plugins.tofix.oauth.signpost.basic
+org.openstreetmap.josm.plugins.tofix.oauth.signpost.exception
+org.openstreetmap.josm.plugins.tofix.oauth.signpost.http
+org.openstreetmap.josm.plugins.tofix.oauth.signpost.signature
+org.openstreetmap.josm.plugins.tofix.util
