@@ -23,7 +23,7 @@ public class Config {
     public static final String URL_TOFIX = "http://osmlab.github.io/to-fix/";
     public static final String URL_OSM = "http://www.openstreetmap.org";
     public static final String URL_TOFIX_ISSUES = "https://github.com/JOSM/tofix/issues";
-    public static final String DEFAULT_API_HOST = "http://54.209.223.159:8000";
+    public static final String DEFAULT_API_HOST = "http://tofix.devseed.com:8000";
     public static String QUERY;
     public static final String DEFAULT_QUERY = "?status=open&lock=unlocked&page_size=1&fc=true&random=true";
     public static String BBOX = "none";
