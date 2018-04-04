@@ -1,6 +1,8 @@
 # Some Files #
 ###################
-nbproject/
+nbproject/	
 build/
 *.class
 *.log
+javadoc/
+*.html

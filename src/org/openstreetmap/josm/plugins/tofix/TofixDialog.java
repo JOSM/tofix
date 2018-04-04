@@ -1,8 +1,5 @@
 package org.openstreetmap.josm.plugins.tofix;
 
-import static org.openstreetmap.josm.tools.I18n.tr;
-
-import java.awt.Cursor;
 import java.awt.GridLayout;
 import java.awt.Label;
 import java.awt.event.ActionEvent;
@@ -10,28 +7,26 @@ import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Hashtable;
 
 import javax.swing.AbstractAction;
+import static javax.swing.Action.NAME;
+import static javax.swing.Action.SHORT_DESCRIPTION;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JSlider;
 import javax.swing.JTabbedPane;
-
+import javax.swing.JTextField;
 import org.openstreetmap.josm.Main;
+
 import org.openstreetmap.josm.actions.UploadAction;
 import org.openstreetmap.josm.data.Bounds;
-import org.openstreetmap.josm.data.UserIdentityManager;
+import org.openstreetmap.josm.data.ProjectionBounds;
+import org.openstreetmap.josm.data.coor.LatLon;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.MapView;
@@ -39,127 +34,166 @@ import org.openstreetmap.josm.gui.Notification;
 import org.openstreetmap.josm.gui.SideButton;
 import org.openstreetmap.josm.gui.dialogs.ToggleDialog;
 import org.openstreetmap.josm.gui.io.UploadDialog;
+import org.openstreetmap.josm.gui.layer.Layer;
 import org.openstreetmap.josm.gui.layer.OsmDataLayer;
-import org.openstreetmap.josm.plugins.tofix.bean.AccessToTask;
-import org.openstreetmap.josm.plugins.tofix.bean.ActionBean;
-import org.openstreetmap.josm.plugins.tofix.bean.ListTaskBean;
-import org.openstreetmap.josm.plugins.tofix.bean.TrackBean;
-import org.openstreetmap.josm.plugins.tofix.bean.items.Item;
+import static org.openstreetmap.josm.gui.mappaint.mapcss.ExpressionFactory.Functions.tr;
+import org.openstreetmap.josm.plugins.tofix.bean.AccessToProject;
+import org.openstreetmap.josm.plugins.tofix.bean.ListProjectBean;
+import org.openstreetmap.josm.plugins.tofix.bean.ProjectBean;
+import org.openstreetmap.josm.plugins.tofix.bean.ItemBean;
 import org.openstreetmap.josm.plugins.tofix.controller.ItemController;
 import org.openstreetmap.josm.plugins.tofix.controller.ItemTrackController;
-import org.openstreetmap.josm.plugins.tofix.controller.ListTaskController;
+import org.openstreetmap.josm.plugins.tofix.controller.ListProjectsController;
 import org.openstreetmap.josm.plugins.tofix.util.Config;
 import org.openstreetmap.josm.plugins.tofix.util.Status;
 import org.openstreetmap.josm.tools.ImageProvider;
-import org.openstreetmap.josm.tools.OpenBrowser;
 import org.openstreetmap.josm.tools.Shortcut;
 
 /**
  *
  * @author ruben
  */
-public class TofixDialog extends ToggleDialog implements ActionListener {
+public final class TofixDialog extends ToggleDialog implements ActionListener {
 
-    boolean validator;
+    MapView mv = MainApplication.getMap().mapView;
+    //PANELS
+    ItemTrackController itemTrackController = new ItemTrackController();
+    JTabbedPane TabbedPanel = new javax.swing.JTabbedPane();
+    JPanel jContentPanelProjects = new JPanel(new GridLayout(1, 1));
+    JPanel jContenActivation = new JPanel(new GridLayout(6, 1));
+    JPanel jPanelProjects = new JPanel(new GridLayout(1, 1));
+    JPanel jPanelQuery = new JPanel(new GridLayout(2, 1));
+
+    private JDOAuth oauth;
+    private JDHost host;
+
+    //OBJECTS FOR EVENTS
     private final SideButton skipButton;
     private final SideButton fixedButton;
     private final SideButton noterrorButton;
-    private Shortcut skipShortcut = null;
-    private Shortcut fixedShortcut = null;
-    private Shortcut noterrorButtonShortcut = null;
-    JSlider slider = new JSlider(JSlider.HORIZONTAL, 1, 5, 1);
+    private final JTextField bboxJtextField;
+    private final Shortcut skipShortcut;
+    private final Shortcut fixedShortcut;
+    private final Shortcut noterrorButtonShortcut;
+    private final JComboBox<String> jcomboBox;
+    private final JCheckBox jCheckBoxToken;
+    private final JCheckBox jCheckBoxDeleteLayer;
+    private final JCheckBox jCheckBoxSetNewAPI;
+    private final JCheckBox jCheckBoxDownloadOSMData;
+    private final JCheckBox jCheckBoxSetDataEditable;
+    private final JCheckBox jCheckBoxSetBbox;
 
-    //size to download
-    double zise = 0.0006; //per default
+    //VARS
+    double zise = 0.0006; //size to download,per default
+    boolean validator;
+    private boolean needDeleteLayer;
+    private boolean isCheckedDownloadOSMData = true;
+    private boolean isCheckedEditableData = false;
+    ArrayList<String> listStringsForCombo = new ArrayList<>();
 
-    AccessToTask mainAccessToTask = null;
-    // Task list
-    ListTaskBean listTaskBean = null;
-    ListTaskController listTaskController = new ListTaskController();
-
-    //Item
-    Item item = new Item();
+    // LOCAL
+    AccessToProject mainAccessToProject = null;
+    ProjectBean project = new ProjectBean();
+    ListProjectsController listProjectController = new ListProjectsController();
+    ListProjectBean projectsList = null;
+    ItemBean item = new ItemBean();
     ItemController itemController = new ItemController();
-
-    // To-Fix layer
-    MapView mv = MainApplication.getMap().mapView;
-
-    ItemTrackController itemTrackController = new ItemTrackController();
-
-    JTabbedPane TabbedPanel = new javax.swing.JTabbedPane();
-
-    JPanel jcontenTasks = new JPanel(new GridLayout(2, 1));
-    JPanel valuePanel = new JPanel(new GridLayout(1, 1));
-
-    JPanel jcontenConfig = new JPanel(new GridLayout(2, 1));
-    JPanel panelslide = new JPanel(new GridLayout(1, 1));
-
-    JPanel jcontenActivation = new JPanel(new GridLayout(4, 1));
-    JPanel panelactivationPlugin = new JPanel(new GridLayout(1, 1));
-    JPanel panelactivationLayer = new JPanel(new GridLayout(1, 1));
-    JPanel panelactivationUrl = new JPanel(new GridLayout(2, 1));
-
-    UserIdentityManager josmUserIdentityManager = UserIdentityManager.getInstance();
-
-    TofixTask tofixTask = new TofixTask();
-    boolean checkboxStatus;
-    boolean checkboxStatusLayer;
-    JCheckBox checkPlugin;
+    TofixProject tofixProject = new TofixProject();
 
     public TofixDialog() {
-
         super(tr("To-fix"), "icontofix", tr("Open to-fix window."),
                 Shortcut.registerShortcut("Tool:To-fix", tr("Toggle: {0}", tr("Tool:To-fix")),
                         KeyEvent.VK_T, Shortcut.ALT_CTRL_SHIFT), 170);
+//==============================================================================FILL COMBO
+        listStringsForCombo.add(tr("Select a project ..."));
+        jcomboBox = new JComboBox<>(listStringsForCombo.toArray(new String[]{}));
+        jcomboBox.addActionListener(this);
+        jPanelProjects.add(jcomboBox);
+        jContentPanelProjects.add(jPanelProjects);
+//==============================================================================CONFIG API URL
+        jContenActivation.add(new Label(tr("Select the checkbox to:")));
 
-        //ENABLE-DISABLE CHECKBOX
-        checkPlugin = new JCheckBox(tr("Enable Tofix plugin"));
-        checkPlugin.setSelected(true);
-        checkboxStatus = checkPlugin.isSelected();
+        jCheckBoxSetNewAPI = new JCheckBox(tr("Set default API"));
+        jCheckBoxSetNewAPI.addActionListener((ActionEvent e) -> {
+            if (!jCheckBoxSetNewAPI.isSelected()) {
+                setHost();
+            } else {
+                JOptionPane.showMessageDialog(this, tr("Setting default API Host"), tr("Confirmation"), JOptionPane.INFORMATION_MESSAGE);
+                Config.preferences(Config.UPDATE, new String[]{"tofix-server.host", Config.DEFAULT_API_HOST}, Config.getPluginPreferencesFile().getAbsolutePath());
+            }
+        });
+        jCheckBoxSetNewAPI.setBorderPainted(true);
+        jContenActivation.add(jCheckBoxSetNewAPI);
 
-        checkPlugin.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                if (e.getStateChange() == ItemEvent.SELECTED) {
-                    checkboxStatus = true;
+//==============================================================================TOKEN
+        jCheckBoxToken = new JCheckBox(tr("Set default Token"));
+        jCheckBoxToken.addActionListener((ActionEvent e) -> {
+            if (!jCheckBoxToken.isSelected()) {
+                setToken();
+            } else {
+                JOptionPane.showMessageDialog(this, tr("Setting default Token"), tr("Confirmation"), JOptionPane.INFORMATION_MESSAGE);
+                Config.preferences(Config.UPDATE, new String[]{"tofix-server.token", Config.DEFAULT_TOKEN}, Config.getPluginPreferencesFile().getAbsolutePath());
+            }
+        });
+        jCheckBoxToken.setBorderPainted(true);
+        jContenActivation.add(jCheckBoxToken);
+//==============================================================================AUTO DELETE LAYER
+        jCheckBoxDeleteLayer = new JCheckBox(tr("Auto delete layer"));
+        jCheckBoxDeleteLayer.setSelected(true);
+        needDeleteLayer = jCheckBoxDeleteLayer.isSelected();
+        jCheckBoxDeleteLayer.addItemListener((ItemEvent e) -> {
+            needDeleteLayer = e.getStateChange() == ItemEvent.SELECTED;
+        });
+        jCheckBoxDeleteLayer.setBorderPainted(true);
+        jContenActivation.add(jCheckBoxDeleteLayer);
+//==============================================================================DOWNLOAD OSM DATA
+        jCheckBoxDownloadOSMData = new JCheckBox(tr("Download OSM Data"));
+        jCheckBoxDownloadOSMData.setSelected(true);
+        jCheckBoxDownloadOSMData.addItemListener((ItemEvent e) -> {
+            isCheckedDownloadOSMData = e.getStateChange() == ItemEvent.SELECTED;
+        });
+        jCheckBoxDownloadOSMData.setBorderPainted(true);
+        jContenActivation.add(jCheckBoxDownloadOSMData);
+//==============================================================================SET EDITABLE DATA
+        jCheckBoxSetDataEditable = new JCheckBox(tr("Set editable layer"));
+        jCheckBoxSetDataEditable.setSelected(false);
+        jCheckBoxSetDataEditable.addItemListener((ItemEvent e) -> {
+            isCheckedEditableData = e.getStateChange() == ItemEvent.SELECTED;
+            if (isCheckedEditableData) {
+                jCheckBoxDeleteLayer.setSelected(false);
+            }
+        });
+        jCheckBoxSetDataEditable.setBorderPainted(true);
+        jContenActivation.add(jCheckBoxSetDataEditable);
+//============================================================================== Select bbox button+jtextfield
+        jCheckBoxSetBbox = new JCheckBox(tr("Set BBox to request the items"));
+        jCheckBoxSetBbox.setSelected(false);
+        bboxJtextField = new JTextField();
+        jCheckBoxSetBbox.addItemListener((ItemEvent e) -> {
+            if (e.getStateChange() == 1) {
+                Layer layer = mv.getLayerManager().getActiveLayer();
+                Bounds bounds;
+                //get the editable bbox layer. 
+                if (layer.isSavable()) {
+                    ProjectionBounds projectionBounds = layer.getViewProjectionBounds();
+                    LatLon minLatlon = Main.getProjection().eastNorth2latlon(projectionBounds.getMin());
+                    LatLon maxLatlon = Main.getProjection().eastNorth2latlon(projectionBounds.getMax());
+                    bounds = new Bounds(minLatlon, maxLatlon);
                 } else {
-                    checkboxStatus = false;
+                    bounds = mv.getRealBounds();
                 }
-                return;
+                String bbox = String.valueOf(bounds.getMinLon()) + "," + String.valueOf(bounds.getMinLat()) + "," + String.valueOf(bounds.getMaxLon()) + "," + String.valueOf(bounds.getMaxLat());
+                bboxJtextField.setText(bbox);
+                Config.setBBOX(bbox);
+            } else {
+                bboxJtextField.setText("");
+                Config.setBBOX("none");
             }
         });
+        jPanelQuery.add(jCheckBoxSetBbox);
+        jPanelQuery.add(bboxJtextField);
 
-        //AUTO DELETE LAYER
-        JCheckBox checkLayer = new JCheckBox(tr("Auto delete layer"));
-        checkLayer.setSelected(true);
-        checkboxStatusLayer = checkLayer.isSelected();
-
-        checkLayer.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                checkboxStatusLayer = e.getStateChange() == ItemEvent.SELECTED;
-            }
-        });
-
-        //CONFIG URL
-        JCheckBox checkUrl = new JCheckBox(tr("Set default url"));
-        checkUrl.setSelected(true);
-
-        jcontenActivation.add(new Label(tr("Select the checkbox to:")));
-        panelactivationPlugin.add(checkPlugin);
-
-        panelactivationLayer.add(checkLayer);
-
-        panelactivationUrl.add(checkUrl);
-
-        jcontenActivation.add(panelactivationPlugin);
-
-        jcontenActivation.add(panelactivationLayer);
-
-        jcontenActivation.add(panelactivationUrl);
-
-        //BUTTONS
-        // "Skip" button
+//=============================================================================="Skip" button
         skipButton = new SideButton(new AbstractAction() {
             {
                 putValue(NAME, tr("Skip"));
@@ -169,20 +203,16 @@ public class TofixDialog extends ToggleDialog implements ActionListener {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (checkboxStatus) {
-                    action("skip");
-                    deleteLayer();
+                skip();
+                deleteLayer();
 
-                } else {
-                    msg();
-                }
             }
         });
-
-        skipButton.setEnabled(
-                false);
-
-        // "Fixed" button
+        skipButton.setEnabled(false);
+        skipShortcut = Shortcut.registerShortcut("tofix:skip", tr("tofix:Skip item"),
+                KeyEvent.VK_S, Shortcut.ALT_SHIFT);
+        MainApplication.registerActionShortcut(new skipKeyAction(), skipShortcut);
+//=============================================================================="Fixed" button
         fixedButton = new SideButton(new AbstractAction() {
             {
                 putValue(NAME, tr("Fixed"));
@@ -192,17 +222,15 @@ public class TofixDialog extends ToggleDialog implements ActionListener {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (checkboxStatus) {
-                    eventFixed(e);
-                } else {
-                    msg();
-                }
+                eventFixed(e);
+
             }
         });
-
         fixedButton.setEnabled(false);
-
-        // "Not a error" button
+        fixedShortcut = Shortcut.registerShortcut("tofix:fixed", tr("tofix:Fixed item"),
+                KeyEvent.VK_F, Shortcut.ALT_SHIFT);
+        MainApplication.registerActionShortcut(new fixedKeyAction(), fixedShortcut);
+//=============================================================================="Not a error" button
         noterrorButton = new SideButton(new AbstractAction() {
             {
                 putValue(NAME, tr("Not an error"));
@@ -212,215 +240,87 @@ public class TofixDialog extends ToggleDialog implements ActionListener {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (checkboxStatus) {
-                    action("noterror");
-                    deleteLayer();
-                } else {
-                    msg();
-                }
+                notError();
+                deleteLayer();
+
             }
         });
-
         noterrorButton.setEnabled(false);
+        noterrorButtonShortcut = Shortcut.registerShortcut("tofix:noterror", tr("tofix:Not a Error item"),
+                KeyEvent.VK_N, Shortcut.ALT_SHIFT);
+        MainApplication.registerActionShortcut(new NotError_key_Action(), noterrorButtonShortcut);
+//============================================================================== FILL PANELS
+        //PANEL TASKS
+        jPanelProjects.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jPanelQuery.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-        //add tittle for To-fix task
-        JLabel title_tasks = new javax.swing.JLabel();
+        TabbedPanel.addTab(tr("Projects"), jContentPanelProjects);        
+        //add panel in JOSM
+        createLayout(TabbedPanel, false, Arrays.asList(new SideButton[]{
+            skipButton, noterrorButton, fixedButton
+        }));
 
-        title_tasks.setText(tr("<html><a href=\"\">List of tasks</a></html>"));
-        title_tasks.setCursor(
-                new Cursor(Cursor.HAND_CURSOR));
-        title_tasks.addMouseListener(
-                new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e
-            ) {
-                OpenBrowser.displayUrl(Config.URL_TOFIX);
+        oauth = new JDOAuth(Main.parent);
+        host = new JDHost(Main.parent);
+        loadOAuthInfo();
+
+    }
+//==============================================================================OBJECT EVENTS==============================================================================
+
+    public void fillCombo() {
+        listStringsForCombo.clear();
+        listStringsForCombo.add(tr("Select a project ..."));
+        if (Status.isInternetReachable()) {
+            projectsList = listProjectController.getListProjects();
+            for (int i = 0; i < projectsList.getProjects().size(); i++) {
+                listStringsForCombo.add(projectsList.getProjects().get(i).getName());
             }
+            jcomboBox.setModel(new DefaultComboBoxModel<>());
+            jcomboBox.setModel(new DefaultComboBoxModel<>(listStringsForCombo.toArray(new String[]{})));
+        } else {
+            skipButton.setEnabled(false);
+            fixedButton.setEnabled(false);
+            noterrorButton.setEnabled(false);
         }
-        );
-        jcontenTasks.add(title_tasks);
+    }
 
-        // JComboBox for each task
-        ArrayList<String> tasksList = new ArrayList<>();
-
-        tasksList.add(tr("Select a task ..."));
-        if (Status.isInternetReachable()) { //checkout  internet connection
-            listTaskBean = listTaskController.getListTasksBean();
-            for (int i = 0; i < listTaskBean.getTasks().size(); i++) {
-                tasksList.add(listTaskBean.getTasks().get(i).getName());
-            }
-
-            JComboBox<String> jcomboBox = new JComboBox<>(tasksList.toArray(new String[]{}));
-            valuePanel.add(jcomboBox);
-            jcomboBox.addActionListener(this);
-            jcontenTasks.add(valuePanel);
-
-            checkUrl.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-
-                    if (checkUrl.isSelected()) {
-                        Config.setHOST(Config.DEFAULT_HOST);
-                        JOptionPane.showMessageDialog(Main.parent, tr("Setting default URL"));
-                    } else {
-                        try {
-                            String newHost = JOptionPane.showInputDialog(tr("Enter the new URL"));
-                            if (newHost.isEmpty()) {
-                                Config.setHOST(Config.DEFAULT_HOST);
-                                JOptionPane.showMessageDialog(Main.parent, tr("Setting default URL"));
-                            } else {
-                                Config.setHOST(newHost);
-                                JOptionPane.showMessageDialog(Main.parent, tr("Setting new URL: " + newHost));
-                            }
-                        } catch (Exception exc) {
-                        }
-                    }
-
-                    listTaskController = new ListTaskController();
-                    tasksList.clear();
-                    tasksList.add(tr("Select a task ..."));
-                    listTaskBean = listTaskController.getListTasksBean();
-                    for (int i = 0; i < listTaskBean.getTasks().size(); i++) {
-                        tasksList.add(listTaskBean.getTasks().get(i).getName());
-                    }
-                    jcomboBox.setModel(new DefaultComboBoxModel<>());
-                    jcomboBox.setModel(new DefaultComboBoxModel<>(tasksList.toArray(new String[]{})));
+    public void setToken() {
+        if (Status.serverStatus()) {
+            oauth.setVisible(true);
+            if (oauth.getTofixToken() != null && !oauth.getTofixToken().equals("")) {
+                if (Config.preferences(Config.GET, new String[]{"tofix-server.token"}, Config.getPluginPreferencesFile().getAbsolutePath()) != null) {
+                    Config.preferences(Config.UPDATE, new String[]{"tofix-server.token", oauth.getTofixToken()}, Config.getPluginPreferencesFile().getAbsolutePath());
+                } else {
+                    Config.preferences(Config.ADD, new String[]{"tofix-server.token", oauth.getTofixToken()}, Config.getPluginPreferencesFile().getAbsolutePath());
                 }
-            }
-            );
-
-            //add title to download
-            jcontenConfig.add(new Label(tr("Set download area (m²)")));
-
-            //Add Slider to download
-            slider.setMinorTickSpacing(2);
-            slider.setMajorTickSpacing(5);
-            slider.setPaintTicks(true);
-            slider.setPaintLabels(true);
-
-            Hashtable<Integer, JLabel> table = new Hashtable<>();
-            table.put(1, new JLabel(tr("~.02")));
-            table.put(3, new JLabel("~.20"));
-            table.put(5, new JLabel("~.40"));
-            slider.setLabelTable(table);
-
-            slider.addChangeListener(new javax.swing.event.ChangeListener() {
-                @Override
-                public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                    zise = slider.getValue() * 0.001;
-                }
-            });
-            panelslide.add(slider);
-            jcontenConfig.add(panelslide);
-
-            //PANEL TASKS
-            valuePanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-            panelslide.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-            panelactivationPlugin.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-            panelactivationLayer.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-            panelactivationUrl.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-
-            TabbedPanel.addTab(tr("Tasks"), jcontenTasks);
-            TabbedPanel.addTab(tr("Config"), jcontenConfig);
-            TabbedPanel.addTab(tr("Activation"), jcontenActivation);
-
-            //add panels in JOSM
-            createLayout(TabbedPanel, false, Arrays.asList(new SideButton[]{
-                skipButton, noterrorButton, fixedButton
-            }));
-
-            if (!Status.server()) {
-                jcomboBox.setEnabled(false);
-                skipButton.setEnabled(false);
-                fixedButton.setEnabled(false);
-                noterrorButton.setEnabled(false);
+                fillCombo();
             } else {
-                //Shortcuts
-                skipShortcut = Shortcut.registerShortcut("tofix:skip", tr("tofix:Skip item"), KeyEvent.VK_S, Shortcut.ALT_SHIFT);
-                MainApplication.registerActionShortcut(new Skip_key_Action(), skipShortcut);
-
-                fixedShortcut = Shortcut.registerShortcut("tofix:fixed", tr("tofix:Fixed item"), KeyEvent.VK_F, Shortcut.ALT_SHIFT);
-                MainApplication.registerActionShortcut(new Fixed_key_Action(), fixedShortcut);
-
-                noterrorButtonShortcut = Shortcut.registerShortcut("tofix:noterror", tr("tofix:Not a Error item"), KeyEvent.VK_N, Shortcut.ALT_SHIFT);
-                MainApplication.registerActionShortcut(new NotError_key_Action(), noterrorButtonShortcut);
+                fillCombo();
             }
+        } else {
+            JOptionPane.showMessageDialog(Main.parent, tr("API did not response! ") + Config.getHOST());
+        }
+
+    }
+
+    private void setHost() {
+        host.setVisible(true);
+        if (host.getHost() != null && host.getHost().equals("")) {
+            fillCombo();
         }
     }
 
-    public final void start() {
-        mainAccessToTask = new AccessToTask("mixedlayer", false);//start mixedlayer task by default
-    }
-
-    public void msg() {
-        JOptionPane.showMessageDialog(
-                Main.parent,
-                tr("Activate to-fix plugin."),
-                tr("Warning"),
-                JOptionPane.WARNING_MESSAGE
-        );
-    }
-
-    public class Skip_key_Action extends AbstractAction {
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if (checkboxStatus) {
-                action("skip");
-                deleteLayer();
-            } else {
-                msg();
-            }
-        }
-    }
-
-    public class Fixed_key_Action extends AbstractAction {
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if (checkboxStatus) {
-                eventFixed(e);
-            } else {
-                msg();
-            }
-        }
-    }
-
-    public class NotError_key_Action extends AbstractAction {
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if (checkboxStatus) {
-                action("noterror");
-                deleteLayer();
-            } else {
-                msg();
-            }
-        }
-    }
-
+// Event select a project, it automatic will get a item and display
     @Override
     public void actionPerformed(ActionEvent e) {
         start();
         JComboBox<?> cb = (JComboBox<?>) e.getSource();
         if (cb.getSelectedIndex() != 0) {
-            mainAccessToTask.setTask_idtask(listTaskBean.getTasks().get(cb.getSelectedIndex() - 1).getIdtask());
-            mainAccessToTask.setTask_isCompleted(listTaskBean.getTasks().get(cb.getSelectedIndex() - 1).getIsCompleted());
-            mainAccessToTask.setTask_isAllItemsLoad(listTaskBean.getTasks().get(cb.getSelectedIndex() - 1).getIsAllItemsLoad());
-            mainAccessToTask.setTask_iduser(listTaskBean.getTasks().get(cb.getSelectedIndex() - 1).getIduser());
-            mainAccessToTask.setTask_name(listTaskBean.getTasks().get(cb.getSelectedIndex() - 1).getName());
-            mainAccessToTask.setTask_description(listTaskBean.getTasks().get(cb.getSelectedIndex() - 1).getDescription());
-            mainAccessToTask.setTask_updated(listTaskBean.getTasks().get(cb.getSelectedIndex() - 1).getUpdated());
-            mainAccessToTask.setTask_changesetComment(listTaskBean.getTasks().get(cb.getSelectedIndex() - 1).getChangesetComment());
-            mainAccessToTask.setTask_date(listTaskBean.getTasks().get(cb.getSelectedIndex() - 1).getDate());
-            mainAccessToTask.setTask_edit(listTaskBean.getTasks().get(cb.getSelectedIndex() - 1).getEdit());
-            mainAccessToTask.setTask_fixed(listTaskBean.getTasks().get(cb.getSelectedIndex() - 1).getFixed());
-            mainAccessToTask.setTask_skip(listTaskBean.getTasks().get(cb.getSelectedIndex() - 1).getSkip());
-            mainAccessToTask.setTask_type(listTaskBean.getTasks().get(cb.getSelectedIndex() - 1).getType());
-            mainAccessToTask.setTask_items(listTaskBean.getTasks().get(cb.getSelectedIndex() - 1).getItems());
-            mainAccessToTask.setTask_noterror(listTaskBean.getTasks().get(cb.getSelectedIndex() - 1).getNoterror());
+            mainAccessToProject.setProject_id(projectsList.getProjects().get(cb.getSelectedIndex() - 1).getId());
+            mainAccessToProject.setProject_name(projectsList.getProjects().get(cb.getSelectedIndex() - 1).getName());
+            project = projectsList.getProjects().get(cb.getSelectedIndex() - 1);
             deleteLayer();
-            get_new_item();
+            getNewItem();
             skipButton.setEnabled(true);
             fixedButton.setEnabled(true);
             noterrorButton.setEnabled(true);
@@ -431,69 +331,66 @@ public class TofixDialog extends ToggleDialog implements ActionListener {
         }
     }
 
-    public void edit() {
-        if (mainAccessToTask.isAccess()) {
-            TrackBean trackBean = new TrackBean();
-            trackBean.getAttributes().setEditor("josm");
-            trackBean.getAttributes().setUser(josmUserIdentityManager.getUserName());
-            itemTrackController.send_track_edit(mainAccessToTask.getTask_url(), trackBean);
+    private void loadOAuthInfo() {
+        if (!Config.getUserName().equals("")) {
+            TabbedPanel.addTab(tr("Activation"), jContenActivation);
+            TabbedPanel.addTab(tr("Querying"), jPanelQuery);
+            
+            oauth.setUserInfo(Config.getUserName(), Config.getPassword(), Config.getTOKEN());
+
+            if (oauth.getTofixToken() != null && !oauth.getTofixToken().equals("")) {
+                if (Status.serverStatus()) {
+                    fillCombo();
+                }
+                if (Config.isDefaultToken(oauth.getTofixToken())) {
+                    jCheckBoxToken.setSelected(true);
+                } else {
+                    jCheckBoxToken.setSelected(false);
+                }
+            }
+            host.setHost(Config.getHOST());
+            if (host.getHost() != null && !host.getHost().equals("")) {
+                if (Config.isDefaultAPI(host.getHost())) {
+                    jCheckBoxSetNewAPI.setSelected(true);
+                } else {
+                    jCheckBoxSetNewAPI.setSelected(false);
+                }
+            }
         }
     }
 
-    public void action(String action) { //fixed, noterror or skip
-        if (mainAccessToTask.isAccess()) {
-            ActionBean trackBean = new ActionBean();
-            trackBean.setAction(action);
-            trackBean.setEditor("josm");
-            trackBean.setUser(josmUserIdentityManager.getUserName());
-            trackBean.setKey(mainAccessToTask.getKey());
-            itemTrackController.send_track_action(mainAccessToTask.getTask_url(), trackBean);
-        }
-        get_new_item();
+    public class skipKeyAction extends AbstractAction {
 
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            skip();
+            deleteLayer();
+        }
     }
 
-    private void get_new_item() {
-        item.setStatus(0);
-        itemController.setAccessToTask(mainAccessToTask);
-        item = itemController.getItem();
-        switch (item.getStatus()) {
-            case 200:
-                mainAccessToTask.setAccess(true);
-                mainAccessToTask = tofixTask.work(item, mainAccessToTask, zise, itemController.getRelation());
-                edit();
-                break;
-            case 410:
-                mainAccessToTask.setAccess(false);
-                tofixTask.task_complete(item, mainAccessToTask);
-                break;
-            case 503:
-                mainAccessToTask.setAccess(false);
-                new Notification(tr("Maintenance server")).show();
-                break;
-            case 520:
-                mainAccessToTask.setAccess(false);
-                JLabel text = new javax.swing.JLabel();
-                text.setText(tr("<html>Something went wrong, please update the plugin or report an issue at <a href=\"\">josm-tofix-plugin/issues</a></html>"));
-                text.setCursor(new Cursor(Cursor.HAND_CURSOR));
-                text.addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mouseClicked(MouseEvent e) {
-                        OpenBrowser.displayUrl(Config.URL_TOFIX_ISSUES);
-                    }
-                });
-                JOptionPane.showMessageDialog(Main.parent, text, tr("Warning"), JOptionPane.WARNING_MESSAGE);
-                break;
-            default:
-                mainAccessToTask.setAccess(false);
-                new Notification(tr("Something went wrong, try again")).show();
+    public class fixedKeyAction extends AbstractAction {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            eventFixed(e);
+        }
+    }
+
+    public class NotError_key_Action extends AbstractAction {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            notError();
+            deleteLayer();
         }
     }
 
     private void eventFixed(ActionEvent e) {
-        if (!MainApplication.getLayerManager().getEditDataSet().isModified()) {
+
+        if (!MainApplication.getLayerManager().getActiveLayer().isSavable() || !MainApplication.getLayerManager().getEditDataSet().isModified()) {
             new Notification(tr("No change to upload!")).show();
-            action("skipeventFixed");
+            //Be sure you mark as fixed
+            fixed();
         } else if (new Bounds(MainApplication.getLayerManager().getEditDataSet().getDataSourceArea().getBounds()).getArea() < 30) {
             validator = false;
             UploadDialog.getUploadDialog().addComponentListener(new ComponentAdapter() {
@@ -502,33 +399,80 @@ public class TofixDialog extends ToggleDialog implements ActionListener {
                     validator = true;
                 }
             });
-        	DataSet data = MainApplication.getLayerManager().getEditLayer().data;
-        	data.getChangeSetTags().put("comment", mainAccessToTask.getTask_changesetComment());
-        	data.getChangeSetTags().put("source", MainApplication.getMap().mapView.getLayerInformationForSourceTag());
-
+            DataSet data = MainApplication.getLayerManager().getEditLayer().data;
+            project.getChangesetComment();
+            //Set up the changeset comment and the source
+            if (!project.getChangesetComment().equals("none")) {
+                data.getChangeSetTags().put("comment", project.getChangesetComment());
+            }
+            data.getChangeSetTags().put("source", MainApplication.getMap().mapView.getLayerInformationForSourceTag());
             new UploadAction().actionPerformed(e);
 
             if (validator && !UploadDialog.getUploadDialog().isCanceled() && UploadDialog.getUploadDialog().getChangeset().isNew()) {
-                action("fixed");
+                fixed();
                 deleteLayer();
             }
         } else {
-            new Notification(tr("The bounding box is too big.")).show();
+            new Notification(tr("The bounding box of the edited layer is too big.")).show();
         }
     }
 
-    public void deleteLayer() {
-        if (checkboxStatusLayer) {
-        	OsmDataLayer editLayer = MainApplication.getLayerManager().getEditLayer();
-            if (editLayer != null) {
-            	editLayer.data.clear();
-                MainApplication.getLayerManager().removeLayer(editLayer);
-            }
+//==============================================================================FUNCTIONS==============================================================================
+    private void getNewItem() {
+        itemController.setAccessToProject(mainAccessToProject);
+        item = itemController.getItem();
+        switch (item.getStatusServer()) {
+            case 200:
+                mainAccessToProject.setAccess(true); //This atribute to access to  the actions
+                mainAccessToProject = tofixProject.work(item, mainAccessToProject, zise, isCheckedDownloadOSMData, isCheckedEditableData);
+                edit();
+                break;
+            case 410:
+                JOptionPane.showMessageDialog(Main.parent, tr("There are no more items on this Project or Area!"), tr("Warning"), JOptionPane.WARNING_MESSAGE);
+                mainAccessToProject.setAccess(false);
+                break;
+            default:
+                mainAccessToProject.setAccess(false);
+                new Notification(tr("Something went wrong, try again")).show();
         }
+    }
+
+//Actions
+    public void edit() {
+        itemTrackController.lockItem(item, "locked");
+    }
+
+    public void skip() {
+        itemTrackController.lockItem(item, "unlocked");
+        getNewItem();
+    }
+
+    public void fixed() {
+        itemTrackController.updateStatusItem(item, "fixed");
+        getNewItem();
+    }
+
+    public void notError() {
+        itemTrackController.updateStatusItem(item, "noterror");
+        getNewItem();
+    }
+
+    public final void start() {
+        mainAccessToProject = new AccessToProject("mixedlayer", false);//start mixedlayer task by default
     }
 
     public void downloadCancelled() {
-        action("skip");
+        skip();
         deleteLayer();
+    }
+
+    public void deleteLayer() {
+        if (needDeleteLayer) {
+            OsmDataLayer editLayer = MainApplication.getLayerManager().getEditLayer();
+            if (editLayer != null) {
+                editLayer.data.clear();
+                MainApplication.getLayerManager().removeLayer(editLayer);
+            }
+        }
     }
 }
