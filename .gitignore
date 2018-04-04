@@ -1,7 +1,7 @@
 # Some Files #
 ###################
-nbproject/
 build/
 *.class
 *.log
 javadoc/
+*.html
