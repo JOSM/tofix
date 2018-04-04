@@ -44,7 +44,7 @@ public class ListProjectsController {
                     projectBean.setId(jsonProject.getString("id"));
                     projectBean.setName(jsonProject.getString("name"));
                     projectBean.setMetadata(jsonProject.getJsonObject("metadata"));
-//                    projectBean.setQuadkey_set_id(jsonProject.getString("quadkey_set_id")); //FIXME
+//                   projectBean.setQuadkey_set_id(jsonProject.getString("quadkey_set_id")); //FIXME
                 }
                 projects.add(projectBean);
             }
