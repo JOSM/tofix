@@ -1,5 +1,6 @@
 # Some Files #
 ###################
+nbproject/	
 build/
 *.class
 *.log
