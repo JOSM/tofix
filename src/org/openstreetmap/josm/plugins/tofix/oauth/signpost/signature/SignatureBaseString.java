@@ -1,13 +1,3 @@
-/*
- * Copyright (c) 2009 Matthias Kaeppler Licensed under the Apache License,
- * Version 2.0 (the "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
- * http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law
- * or agreed to in writing, software distributed under the License is
- * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied. See the License for the specific language
- * governing permissions and limitations under the License.
- */
 package org.openstreetmap.josm.plugins.tofix.oauth.signpost.signature;
 
 import java.io.IOException;
@@ -26,28 +16,11 @@ public class SignatureBaseString {
 
     private HttpParameters requestParameters;
 
-    /**
-     * Constructs a new SBS instance that will operate on the given request
-     * object and parameter set.
-     * 
-     * @param request
-     *        the HTTP request
-     * @param requestParameters
-     *        the set of request parameters from the Authorization header, query
-     *        string and form body
-     */
     public SignatureBaseString(HttpRequest request, HttpParameters requestParameters) {
         this.request = request;
         this.requestParameters = requestParameters;
     }
 
-    /**
-     * Builds the signature base string from the data this instance was
-     * configured with.
-     * 
-     * @return the signature base string
-     * @throws OAuthMessageSignerException
-     */
     public String generate() throws OAuthMessageSignerException {
 
         try {
@@ -82,15 +55,6 @@ public class SignatureBaseString {
         return scheme + "://" + authority + path;
     }
 
-    /**
-     * Normalizes the set of request parameters this instance was configured
-     * with, as per OAuth spec section 9.1.1.
-     * 
-     * @param parameters
-     *        the set of request parameters
-     * @return the normalized params string
-     * @throws IOException
-     */
     public String normalizeRequestParameters() throws IOException {
         if (requestParameters == null) {
             return "";

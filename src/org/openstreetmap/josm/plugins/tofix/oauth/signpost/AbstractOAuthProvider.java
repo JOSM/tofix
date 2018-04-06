@@ -1,18 +1,9 @@
-/*
- * Copyright (c) 2009 Matthias Kaeppler Licensed under the Apache License,
- * Version 2.0 (the "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
- * http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law
- * or agreed to in writing, software distributed under the License is
- * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied. See the License for the specific language
- * governing permissions and limitations under the License.
- */
 package org.openstreetmap.josm.plugins.tofix.oauth.signpost;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -111,45 +102,7 @@ public abstract class AbstractOAuthProvider implements OAuthProvider {
         retrieveToken(consumer, accessTokenEndpointUrl, params);
     }
 
-    /**
-     * <p>
-     * Implemented by subclasses. The responsibility of this method is to
-     * contact the service provider at the given endpoint URL and fetch a
-     * request or access token. What kind of token is retrieved solely depends
-     * on the URL being used.
-     * </p>
-     * <p>
-     * Correct implementations of this method must guarantee the following
-     * post-conditions:
-     * <ul>
-     * <li>the {@link OAuthConsumer} passed to this method must have a valid
-     * {@link OAuth#OAUTH_TOKEN} and {@link OAuth#OAUTH_TOKEN_SECRET} set by
-     * calling {@link OAuthConsumer#setTokenWithSecret(String, String)}</li>
-     * <li>{@link #getResponseParameters()} must return the set of query
-     * parameters served by the service provider in the token response, with all
-     * OAuth specific parameters being removed</li>
-     * </ul>
-     * </p>
-     *
-     * @param consumer
-     *        the {@link OAuthConsumer} that should be used to sign the request
-     * @param endpointUrl
-     *        the URL at which the service provider serves the OAuth token that
-     *        is to be fetched
-     * @param customOAuthParams
-     *        you can pass custom OAuth parameters here (such as oauth_callback
-     *        or oauth_verifier) which will go directly into the signer, i.e.
-     *        you don't have to put them into the request first.
-     * @throws OAuthMessageSignerException
-     *         if signing the token request fails
-     * @throws OAuthCommunicationException
-     *         if a network communication error occurs
-     * @throws OAuthNotAuthorizedException
-     *         if the server replies 401 - Unauthorized
-     * @throws OAuthExpectationFailedException
-     *         if an expectation has failed, e.g. because the server didn't
-     *         reply in the expected format
-     */
+    @SuppressWarnings("Finally")
     protected void retrieveToken(OAuthConsumer consumer, String endpointUrl,
             HttpParameters customOAuthParams) throws OAuthMessageSignerException,
             OAuthCommunicationException, OAuthNotAuthorizedException,
@@ -213,9 +166,7 @@ public abstract class AbstractOAuthProvider implements OAuthProvider {
 
             consumer.setTokenWithSecret(token, secret);
 
-        } catch (OAuthNotAuthorizedException e) {
-            throw e;
-        } catch (OAuthExpectationFailedException e) {
+        } catch (OAuthNotAuthorizedException | OAuthExpectationFailedException e) {
             throw e;
         } catch (Exception e) {
             throw new OAuthCommunicationException(e);
@@ -235,7 +186,7 @@ public abstract class AbstractOAuthProvider implements OAuthProvider {
         StringBuilder responseBody = new StringBuilder();
         InputStream content = response.getContent();
         if (content != null) {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(content));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(content,StandardCharsets.UTF_8));
 
             String line = reader.readLine();
             while (line != null) {
@@ -253,41 +204,10 @@ public abstract class AbstractOAuthProvider implements OAuthProvider {
         }
     }
 
-    /**
-     * Overrride this method if you want to customize the logic for building a
-     * request object for the given endpoint URL.
-     *
-     * @param endpointUrl
-     *        the URL to which the request will go
-     * @return the request object
-     * @throws Exception
-     *         if something breaks
-     */
     protected abstract HttpRequest createRequest(String endpointUrl) throws Exception;
 
-    /**
-     * Override this method if you want to customize the logic for how the given
-     * request is sent to the server.
-     *
-     * @param request
-     *        the request to send
-     * @return the response to the request
-     * @throws Exception
-     *         if something breaks
-     */
     protected abstract HttpResponse sendRequest(HttpRequest request) throws Exception;
 
-    /**
-     * Called when the connection is being finalized after receiving the
-     * response. Use this to do any cleanup / resource freeing.
-     *
-     * @param request
-     *        the request that has been sent
-     * @param response
-     *        the response that has been received
-     * @throws Exception
-     *         if something breaks
-     */
     protected void closeConnection(HttpRequest request, HttpResponse response) throws Exception {
         // NOP
     }
@@ -297,15 +217,6 @@ public abstract class AbstractOAuthProvider implements OAuthProvider {
         return responseParameters;
     }
 
-    /**
-     * Returns a single query parameter as served by the service provider in a
-     * token reply. You must call {@link #setResponseParameters} with the set of
-     * parameters before using this method.
-     *
-     * @param key
-     *        the parameter name
-     * @return the parameter value
-     */
     protected String getResponseParameter(String key) {
         return responseParameters.getFirst(key);
     }
@@ -340,12 +251,12 @@ public abstract class AbstractOAuthProvider implements OAuthProvider {
         return this.authorizationWebsiteUrl;
     }
 
-    @Override
+    @Override @SuppressWarnings("deprecation")
     public void setRequestHeader(String header, String value) {
         defaultHeaders.put(header, value);
     }
 
-    @Override
+    @Override @SuppressWarnings("deprecation")
     public Map<String, String> getRequestHeaders() {
         return defaultHeaders;
     }

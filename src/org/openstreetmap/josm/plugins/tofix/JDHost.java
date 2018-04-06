@@ -41,12 +41,14 @@ public class JDHost extends javax.swing.JDialog {
 
         jButton1.setText("Test");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
             }
         });
 
         jTextField1.addActionListener(new java.awt.event.ActionListener() {
+	    @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jTextField1ActionPerformed(evt);
             }
@@ -56,6 +58,7 @@ public class JDHost extends javax.swing.JDialog {
 
         jButton2.setText("Ok");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);
             }

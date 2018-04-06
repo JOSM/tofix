@@ -49,7 +49,7 @@ Tofix-plugin has different actions, which you could use for different type of wo
 
 #### Set default API
 
-Tofix-plugin  is using per default the API: [http://54.209.223.159:8000](http://54.209.223.159:8000), but if you want to set up your own API, you could set up selecting the option, `Set default API`
+Tofix-plugin  is using per default the API: [http://tofix.devseed.com:8000](http://tofix.devseed.com:8000), but if you want to set up your own API, you could set up selecting the option, `Set default API`
 
 ![image](https://user-images.githubusercontent.com/1152236/38280650-2e8ec6bc-376c-11e8-9e5c-b182b293f2c5.png)
 
@@ -74,7 +74,7 @@ Tofix-plugin by default will download OSM data for the work area, but in case yo
 
 #### Set editable Layer
 
-Tofix-plugin helps to edit the data that has been uploaded into the [tofix-backend](https://github.com/osmlab/to-fix-backend) [API](http://54.209.223.159:8000).  this functionality could help in cases you want to import data into OSM, checking feature by feature.
+Tofix-plugin helps to edit the data that has been uploaded into the [tofix-backend](https://github.com/osmlab/to-fix-backend) [API](http://tofix.devseed.com:8000).  this functionality could help in cases you want to import data into OSM, checking feature by feature.
 
 ![get7](https://user-images.githubusercontent.com/1152236/38280393-a2d406ce-376a-11e8-80af-c6155847a840.gif)
 

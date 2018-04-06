@@ -3,6 +3,7 @@ package org.openstreetmap.josm.plugins.tofix.oauth;
 import org.openstreetmap.josm.plugins.tofix.oauth.signpost.*;
 import java.io.*;
 import java.net.*;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.regex.*;
@@ -387,7 +388,7 @@ public class OAuthClient {
             connection.setReadTimeout(15 * 1000);
             connection.connect();
 
-            reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            reader = new BufferedReader(new InputStreamReader(connection.getInputStream(),StandardCharsets.UTF_8));
             stringBuilder = new StringBuilder();
 
             String line = null;
@@ -444,13 +445,13 @@ public class OAuthClient {
         StringBuilder stringBuilder;
 
         try {
-            url = new URL(_url+new String(getDataBytes));
+            url = new URL(_url+new String(getDataBytes,StandardCharsets.UTF_8));
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
             connection.setReadTimeout(15 * 1000);
             connection.connect();
 
-            reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            reader = new BufferedReader(new InputStreamReader(connection.getInputStream(),StandardCharsets.UTF_8));
             stringBuilder = new StringBuilder();
 
             String line = null;

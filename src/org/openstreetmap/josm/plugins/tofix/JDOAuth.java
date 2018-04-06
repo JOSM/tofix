@@ -60,6 +60,7 @@ public class JDOAuth extends javax.swing.JDialog {
 
         jButton1.setText("Autorize now");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
+	    @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
             }
@@ -72,6 +73,7 @@ public class JDOAuth extends javax.swing.JDialog {
         jTextField1.setEditable(false);
 
         jPasswordField1.addActionListener(new java.awt.event.ActionListener() {
+	    @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jPasswordField1ActionPerformed(evt);
             }
@@ -126,6 +128,7 @@ public class JDOAuth extends javax.swing.JDialog {
 
         jButton2.setText("Generate New Access Token");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);
             }
@@ -133,6 +136,7 @@ public class JDOAuth extends javax.swing.JDialog {
 
         jButton3.setText("Ok");
         jButton3.addActionListener(new java.awt.event.ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton3ActionPerformed(evt);
             }
@@ -241,8 +245,8 @@ public class JDOAuth extends javax.swing.JDialog {
     public void autenticationOSM() {
         try {
             OAuthClient c = new OAuthClient();
-            sessionId = c.authorise(jTextField1.getText(), jPasswordField1.getText(), OAuthClient.getPrivileges());
-
+            sessionId = c.authorise(jTextField1.getText(),String.copyValueOf(jPasswordField1.getPassword()), OAuthClient.getPrivileges());
+         
             requestToken = c.getRequestToken();
             c.getOAuthToken(sessionId, requestToken);
             Logging.info(sessionId.getToken());

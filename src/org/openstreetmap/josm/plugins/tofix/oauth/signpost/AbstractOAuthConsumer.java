@@ -1,17 +1,3 @@
-/* Copyright (c) 2009 Matthias Kaeppler
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package org.openstreetmap.josm.plugins.tofix.oauth.signpost;
 
 import java.io.IOException;
@@ -31,12 +17,6 @@ import org.openstreetmap.josm.plugins.tofix.oauth.signpost.signature.OAuthMessag
 import org.openstreetmap.josm.plugins.tofix.oauth.signpost.signature.QueryStringSigningStrategy;
 import org.openstreetmap.josm.plugins.tofix.oauth.signpost.signature.SigningStrategy;
 
-/**
- * ABC for consumer implementations. If you're developing a custom consumer you
- * will probably inherit from this class to save you a lot of work.
- *
- * @author Matthias Kaeppler
- */
 public abstract class AbstractOAuthConsumer implements OAuthConsumer {
 
     private static final long serialVersionUID = 1L;
@@ -143,14 +123,6 @@ public abstract class AbstractOAuthConsumer implements OAuthConsumer {
         return request.getRequestUrl();
     }
 
-    /**
-     * Adapts the given request object to a Signpost {@link HttpRequest}. How
-     * this is done depends on the consumer implementation.
-     *
-     * @param request
-     *        the native HTTP request instance
-     * @return the adapted request
-     */
     protected abstract HttpRequest wrap(Object request);
 
     @Override
@@ -179,22 +151,6 @@ public abstract class AbstractOAuthConsumer implements OAuthConsumer {
         return this.consumerSecret;
     }
 
-    /**
-     * <p>
-     * Helper method that adds any OAuth parameters to the given request
-     * parameters which are missing from the current request but required for
-     * signing. A good example is the oauth_nonce parameter, which is typically
-     * not provided by the client in advance.
-     * </p>
-     * <p>
-     * It's probably not a very good idea to override this method. If you want
-     * to generate different nonces or timestamps, override
-     * {@link #generateNonce()} or {@link #generateTimestamp()} instead.
-     * </p>
-     *
-     * @param out
-     *        the request parameter which should be completed
-     */
     protected void completeOAuthParameters(HttpParameters out) {
         if (!out.containsKey(OAuth.OAUTH_CONSUMER_KEY)) {
             out.put(OAuth.OAUTH_CONSUMER_KEY, consumerKey, true);
@@ -212,7 +168,7 @@ public abstract class AbstractOAuthConsumer implements OAuthConsumer {
             out.put(OAuth.OAUTH_VERSION, OAuth.VERSION_1_0, true);
         }
         if (!out.containsKey(OAuth.OAUTH_TOKEN)) {
-            if (token != null && !token.equals("") || sendEmptyTokens) {
+            if ((token != null && !token.equals("")) || sendEmptyTokens) {
                 out.put(OAuth.OAUTH_TOKEN, token, true);
             }
         }
@@ -228,19 +184,11 @@ public abstract class AbstractOAuthConsumer implements OAuthConsumer {
         this.sendEmptyTokens = enable;
     }
 
-    /**
-     * Collects OAuth Authorization header parameters as per OAuth Core 1.0 spec
-     * section 9.1.1
-     */
     protected void collectHeaderParameters(HttpRequest request, HttpParameters out) {
         HttpParameters headerParams = OAuth.oauthHeaderToParamsMap(request.getHeader(OAuth.HTTP_AUTHORIZATION_HEADER));
         out.putAll(headerParams, false);
     }
 
-    /**
-     * Collects x-www-form-urlencoded body parameters as per OAuth Core 1.0 spec
-     * section 9.1.1
-     */
     protected void collectBodyParameters(HttpRequest request, HttpParameters out)
             throws IOException {
 
@@ -252,10 +200,6 @@ public abstract class AbstractOAuthConsumer implements OAuthConsumer {
         }
     }
 
-    /**
-     * Collects HTTP GET query string parameters as per OAuth Core 1.0 spec
-     * section 9.1.1
-     */
     protected void collectQueryParameters(HttpRequest request, HttpParameters out) {
 
         String url = request.getRequestUrl();

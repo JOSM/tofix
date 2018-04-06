@@ -1,17 +1,3 @@
-/* Copyright (c) 2008, 2009 Netflix, Matthias Kaeppler
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package org.openstreetmap.josm.plugins.tofix.oauth.signpost;
 
 import java.io.BufferedReader;
@@ -28,6 +14,7 @@ import java.util.Map;
 import org.openstreetmap.josm.plugins.tofix.oauth.signpost.http.HttpParameters;
 
 import com.google.gdata.util.common.base.PercentEscaper;
+import java.nio.charset.StandardCharsets;
 
 public class OAuth {
 
@@ -60,19 +47,9 @@ public class OAuth {
     public static final String OAUTH_CALLBACK_CONFIRMED = "oauth_callback_confirmed";
 
     public static final String OAUTH_VERIFIER = "oauth_verifier";
-
-    /**
-     * Pass this value as the callback "url" upon retrieving a request token if
-     * your application cannot receive callbacks (e.g. because it's a desktop
-     * app). This will tell the service provider that verification happens
-     * out-of-band, which basically means that it will generate a PIN code (the
-     * OAuth verifier) and display that to your user. You must obtain this code
-     * from your user and pass it to
-     * {@link OAuthProvider#retrieveAccessToken(OAuthConsumer, String)} in order
-     * to complete the token handshake.
-     */
+    
     public static final String OUT_OF_BAND = "oob";
-
+   
     private static final PercentEscaper percentEncoder = new PercentEscaper(
             "-._~", false);
 
@@ -95,11 +72,6 @@ public class OAuth {
         }
     }
 
-    /**
-     * Construct a x-www-form-urlencoded document containing the given sequence
-     * of name/value pairs. Use OAuth percent encoding (not exactly the encoding
-     * mandated by x-www-form-urlencoded).
-     */
     public static <T extends Map.Entry<String, String>> void formEncode(Collection<T> parameters,
             OutputStream into) throws IOException {
         if (parameters != null) {
@@ -110,26 +82,20 @@ public class OAuth {
                 } else {
                     into.write('&');
                 }
-                into.write(percentEncode(safeToString(entry.getKey())).getBytes());
+                into.write(percentEncode(safeToString(entry.getKey())).getBytes(StandardCharsets.UTF_8));
                 into.write('=');
-                into.write(percentEncode(safeToString(entry.getValue())).getBytes());
+                into.write(percentEncode(safeToString(entry.getValue())).getBytes(StandardCharsets.UTF_8));
             }
         }
     }
 
-    /**
-     * Construct a x-www-form-urlencoded document containing the given sequence
-     * of name/value pairs. Use OAuth percent encoding (not exactly the encoding
-     * mandated by x-www-form-urlencoded).
-     */
     public static <T extends Map.Entry<String, String>> String formEncode(Collection<T> parameters)
             throws IOException {
         ByteArrayOutputStream b = new ByteArrayOutputStream();
         formEncode(parameters, b);
-        return new String(b.toByteArray());
+        return new String(b.toByteArray(),StandardCharsets.UTF_8);
     }
 
-    /** Parse a form-urlencoded document. */
     public static HttpParameters decodeForm(String form) {
         HttpParameters params = new HttpParameters();
         if (isEmpty(form)) {
@@ -154,8 +120,7 @@ public class OAuth {
 
     public static HttpParameters decodeForm(InputStream content)
             throws IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(
-                content));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(content,StandardCharsets.UTF_8));
         StringBuilder sb = new StringBuilder();
         String line = reader.readLine();
         while (line != null) {
@@ -166,13 +131,8 @@ public class OAuth {
         return decodeForm(sb.toString());
     }
 
-    /**
-     * Construct a Map containing a copy of the given parameters. If several
-     * parameters have the same name, the Map will contain the first value,
-     * only.
-     */
     public static <T extends Map.Entry<String, String>> Map<String, String> toMap(Collection<T> from) {
-        HashMap<String, String> map = new HashMap<String, String>();
+        HashMap<String, String> map = new HashMap<>();
         if (from != null) {
             for (Map.Entry<String, String> entry : from) {
                 String key = entry.getKey();
@@ -192,28 +152,6 @@ public class OAuth {
         return (str == null) || (str.length() == 0);
     }
 
-    /**
-     * Appends a list of key/value pairs to the given URL, e.g.:
-     * 
-     * <pre>
-     * String url = OAuth.addQueryParameters(&quot;http://example.com?a=1&quot;, b, 2, c, 3);
-     * </pre>
-     * 
-     * which yields:
-     * 
-     * <pre>
-     * http://example.com?a=1&b=2&c=3
-     * </pre>
-     * 
-     * All parameters will be encoded according to OAuth's percent encoding
-     * rules.
-     * 
-     * @param url
-     *        the URL
-     * @param kvPairs
-     *        the list of key/value pairs
-     * @return
-     */
     public static String addQueryParameters(String url, String... kvPairs) {
         String queryDelim = url.contains("?") ? "&" : "?";
         StringBuilder sb = new StringBuilder(url + queryDelim);
@@ -245,25 +183,6 @@ public class OAuth {
         return sb.toString();
     }
 
-    /**
-     * Builds an OAuth header from the given list of header fields. All
-     * parameters starting in 'oauth_*' will be percent encoded.
-     * 
-     * <pre>
-     * String authHeader = OAuth.prepareOAuthHeader(&quot;realm&quot;, &quot;http://example.com&quot;, &quot;oauth_token&quot;, &quot;x%y&quot;);
-     * </pre>
-     * 
-     * which yields:
-     * 
-     * <pre>
-     * OAuth realm=&quot;http://example.com&quot;, oauth_token=&quot;x%25y&quot;
-     * </pre>
-     * 
-     * @param kvPairs
-     *        the list of key/value pairs
-     * @return a string eligible to be used as an OAuth HTTP Authorization
-     *         header.
-     */
     public static String prepareOAuthHeader(String... kvPairs) {
         StringBuilder sb = new StringBuilder("OAuth ");
         for (int i = 0; i < kvPairs.length; i += 2) {
@@ -292,17 +211,6 @@ public class OAuth {
         return params;
     }
 
-    /**
-     * Helper method to concatenate a parameter and its value to a pair that can
-     * be used in an HTTP header. This method percent encodes both parts before
-     * joining them.
-     * 
-     * @param name
-     *        the OAuth parameter name, e.g. oauth_token
-     * @param value
-     *        the OAuth parameter value, e.g. 'hello oauth'
-     * @return a name/value pair, e.g. oauth_token="hello%20oauth"
-     */
     public static String toHeaderElement(String name, String value) {
         return OAuth.percentEncode(name) + "=\"" + OAuth.percentEncode(value) + "\"";
     }

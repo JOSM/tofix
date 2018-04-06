@@ -2,6 +2,7 @@ package org.openstreetmap.josm.plugins.tofix.util;
 
 import java.io.*;
 import java.net.*;
+import java.nio.charset.StandardCharsets;
 import java.util.logging.*;
 import javax.json.*;
 import static org.openstreetmap.josm.gui.mappaint.mapcss.ExpressionFactory.Functions.tr;
@@ -24,7 +25,7 @@ public class Status {
             HttpURLConnection con = (HttpURLConnection) new URL(url).openConnection();
             con.connect();
             if (con.getResponseCode() == 200) {
-                BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
+                BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream(),StandardCharsets.UTF_8));
                 String responseString = "";
                 while (br.ready()) {
                     responseString = br.readLine();
