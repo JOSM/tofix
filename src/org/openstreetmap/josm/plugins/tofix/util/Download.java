@@ -39,7 +39,7 @@ public class Download {
             bounds.extend(bounds.getMax().lat() + 0.0001, bounds.getMax().lon() + 0.0001);
             bounds.extend(bounds.getMin().lat() - 0.0001, bounds.getMin().lon() - 0.0001);
         } else if (bounds.getArea() > 10) {
-            JOptionPane.showMessageDialog(Main.parent, tr("It is a big area, it can't be downloaded!"), tr("Warning"), JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(Main.parent, tr("This big area cannot be downloaded!"), tr("Warning"), JOptionPane.WARNING_MESSAGE);
             return;
         }
         final Future<?> future = task.download(true, bounds, monitor);

@@ -35,10 +35,10 @@ public class Status {
                 Logger.getLogger(Class.class.getName()).log(Level.INFO, "{0} -> {1} -> {2}", new Object[]{tr("API server status : " + statusObject.getString("status")), url,con.getResponseCode()});
                 return true;
             }
-            Logger.getLogger(Class.class.getName()).log(Level.INFO, "{0} -> {1} -> {2}", new Object[]{tr("API didn't response!"), url,con.getResponseCode()});
+            Logger.getLogger(Class.class.getName()).log(Level.INFO, "{0} -> {1} -> {2}", new Object[]{tr("API did not respond!"), url,con.getResponseCode()});
             return false;
         } catch (Exception ex) {
-            Logger.getLogger(Class.class.getName()).log(Level.INFO, "{0} -> {1} ({2})", new Object[]{tr("API didn't response!"), url,tr("connection refused")});
+            Logger.getLogger(Class.class.getName()).log(Level.INFO, "{0} -> {1} ({2})", new Object[]{tr("API did not respond!"), url,tr("connection refused")});
             return false;
         }
     }
