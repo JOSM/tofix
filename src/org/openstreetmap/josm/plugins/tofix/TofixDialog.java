@@ -388,7 +388,7 @@ public final class TofixDialog extends ToggleDialog implements ActionListener {
     private void eventFixed(ActionEvent e) {
 
         if (!MainApplication.getLayerManager().getActiveLayer().isSavable() || !MainApplication.getLayerManager().getEditDataSet().isModified()) {
-            new Notification(tr("No change to upload!")).show();
+            new Notification(tr("No changes to upload.")).show();
             //Be sure you mark as fixed
             fixed();
         } else if (new Bounds(MainApplication.getLayerManager().getEditDataSet().getDataSourceArea().getBounds()).getArea() < 30) {
