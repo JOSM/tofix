@@ -1,16 +1,14 @@
 package org.openstreetmap.josm.plugins.tofix;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static org.openstreetmap.josm.gui.mappaint.mapcss.ExpressionFactory.Functions.tr;
+
 import org.geojson.GeoJsonObject;
 import org.geojson.GeometryCollection;
-
 import org.openstreetmap.josm.data.Bounds;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.MapView;
 import org.openstreetmap.josm.gui.io.UploadDialog;
 import org.openstreetmap.josm.gui.layer.Layer;
-import static org.openstreetmap.josm.gui.mappaint.mapcss.ExpressionFactory.Functions.tr;
 import org.openstreetmap.josm.plugins.geojson.DataSetBuilder;
 import org.openstreetmap.josm.plugins.geojson.DataSetBuilder.BoundedDataSet;
 import org.openstreetmap.josm.plugins.geojson.GeoJsonLayer;
@@ -19,6 +17,9 @@ import org.openstreetmap.josm.plugins.tofix.bean.ItemBean;
 import org.openstreetmap.josm.plugins.tofix.controller.ItemController;
 import org.openstreetmap.josm.plugins.tofix.util.Download;
 import org.openstreetmap.josm.tools.Logging;
+
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  *

@@ -19,8 +19,8 @@ import java.io.Serializable;
 import java.util.Base64;
 
 import org.openstreetmap.josm.plugins.tofix.oauth.signpost.exception.OAuthMessageSignerException;
-import org.openstreetmap.josm.plugins.tofix.oauth.signpost.http.HttpRequest;
 import org.openstreetmap.josm.plugins.tofix.oauth.signpost.http.HttpParameters;
+import org.openstreetmap.josm.plugins.tofix.oauth.signpost.http.HttpRequest;
 
 public abstract class OAuthMessageSigner implements Serializable {
 

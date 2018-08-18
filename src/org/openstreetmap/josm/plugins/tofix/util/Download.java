@@ -1,13 +1,15 @@
 package org.openstreetmap.josm.plugins.tofix.util;
 
+import static org.openstreetmap.josm.gui.mappaint.mapcss.ExpressionFactory.Functions.tr;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.swing.JOptionPane;
-import org.openstreetmap.josm.Main;
 
 import org.openstreetmap.josm.actions.AutoScaleAction;
 import org.openstreetmap.josm.actions.downloadtasks.DownloadOsmTask;
@@ -19,7 +21,6 @@ import org.openstreetmap.josm.data.osm.OsmPrimitive;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.gui.MainApplication;
-import static org.openstreetmap.josm.gui.mappaint.mapcss.ExpressionFactory.Functions.tr;
 import org.openstreetmap.josm.gui.progress.ProgressMonitor;
 import org.openstreetmap.josm.plugins.tofix.TofixDialog;
 
@@ -39,7 +40,7 @@ public class Download {
             bounds.extend(bounds.getMax().lat() + 0.0001, bounds.getMax().lon() + 0.0001);
             bounds.extend(bounds.getMin().lat() - 0.0001, bounds.getMin().lon() - 0.0001);
         } else if (bounds.getArea() > 10) {
-            JOptionPane.showMessageDialog(Main.parent, tr("This big area cannot be downloaded!"), tr("Warning"), JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(MainApplication.getMainFrame(), tr("This big area cannot be downloaded!"), tr("Warning"), JOptionPane.WARNING_MESSAGE);
             return;
         }
         final Future<?> future = task.download(true, bounds, monitor);

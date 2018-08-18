@@ -3,10 +3,12 @@ package org.openstreetmap.josm.plugins.tofix.controller;
 import java.io.StringReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
+
 import org.openstreetmap.josm.plugins.tofix.bean.AccessToProject;
 import org.openstreetmap.josm.plugins.tofix.bean.ItemBean;
 import org.openstreetmap.josm.plugins.tofix.util.Request;

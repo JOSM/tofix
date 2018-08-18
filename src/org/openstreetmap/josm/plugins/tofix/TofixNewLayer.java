@@ -1,5 +1,7 @@
 package org.openstreetmap.josm.plugins.tofix;
 
+import static org.openstreetmap.josm.tools.I18n.tr;
+
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -26,7 +28,6 @@ import org.openstreetmap.josm.gui.dialogs.LayerListDialog;
 import org.openstreetmap.josm.gui.dialogs.LayerListPopup;
 import org.openstreetmap.josm.gui.layer.Layer;
 import org.openstreetmap.josm.plugins.geojson.DataSetBuilder.BoundedDataSet;
-import static org.openstreetmap.josm.tools.I18n.tr;
 import org.openstreetmap.josm.tools.ImageProvider;
 
 public class TofixNewLayer extends Layer implements ActionListener {

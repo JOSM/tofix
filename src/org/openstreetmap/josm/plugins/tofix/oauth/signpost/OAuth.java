@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -14,7 +15,6 @@ import java.util.Map;
 import org.openstreetmap.josm.plugins.tofix.oauth.signpost.http.HttpParameters;
 
 import com.google.gdata.util.common.base.PercentEscaper;
-import java.nio.charset.StandardCharsets;
 
 public class OAuth {
 

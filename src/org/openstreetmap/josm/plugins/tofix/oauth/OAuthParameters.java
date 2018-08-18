@@ -5,11 +5,10 @@ import java.util.Objects;
 
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.io.OsmApi;
-import org.openstreetmap.josm.tools.CheckParameterUtil;
-import org.openstreetmap.josm.tools.Utils;
-
 import org.openstreetmap.josm.plugins.tofix.oauth.signpost.OAuthConsumer;
 import org.openstreetmap.josm.plugins.tofix.oauth.signpost.OAuthProvider;
+import org.openstreetmap.josm.tools.CheckParameterUtil;
+import org.openstreetmap.josm.tools.Utils;
 
 /**
  * This class manages an immutable set of OAuth parameters.

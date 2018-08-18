@@ -3,9 +3,8 @@ package org.openstreetmap.josm.plugins.tofix.oauth;
 
 import java.util.Objects;
 
-import org.openstreetmap.josm.tools.CheckParameterUtil;
-
 import org.openstreetmap.josm.plugins.tofix.oauth.signpost.OAuthConsumer;
+import org.openstreetmap.josm.tools.CheckParameterUtil;
 
 /**
  * An oauth token that has been obtained by JOSM and can be used to authenticate the user on the server.

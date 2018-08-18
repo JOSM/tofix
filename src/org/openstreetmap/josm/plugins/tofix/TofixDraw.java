@@ -4,7 +4,6 @@ import static org.openstreetmap.josm.tools.I18n.tr;
 
 import javax.swing.JOptionPane;
 
-import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.data.osm.visitor.BoundingXYVisitor;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.plugins.geojson.DataSetBuilder.BoundedDataSet;
@@ -17,7 +16,7 @@ public class TofixDraw {
 
     public static void draw(final TofixNewLayer tofixNewLayer, BoundedDataSet data) {
         if (data == null) {
-            JOptionPane.showMessageDialog(Main.parent, tr("Can not print the layer"));
+            JOptionPane.showMessageDialog(MainApplication.getMainFrame(), tr("Can not print the layer"));
             return;
         }
         BoundingXYVisitor v = new BoundingXYVisitor();

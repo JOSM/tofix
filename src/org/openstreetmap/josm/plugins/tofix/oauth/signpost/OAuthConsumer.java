@@ -21,10 +21,7 @@ import org.openstreetmap.josm.plugins.tofix.oauth.signpost.exception.OAuthExpect
 import org.openstreetmap.josm.plugins.tofix.oauth.signpost.exception.OAuthMessageSignerException;
 import org.openstreetmap.josm.plugins.tofix.oauth.signpost.http.HttpParameters;
 import org.openstreetmap.josm.plugins.tofix.oauth.signpost.http.HttpRequest;
-import org.openstreetmap.josm.plugins.tofix.oauth.signpost.signature.AuthorizationHeaderSigningStrategy;
-import org.openstreetmap.josm.plugins.tofix.oauth.signpost.signature.HmacSha1MessageSigner;
 import org.openstreetmap.josm.plugins.tofix.oauth.signpost.signature.OAuthMessageSigner;
-import org.openstreetmap.josm.plugins.tofix.oauth.signpost.signature.QueryStringSigningStrategy;
 import org.openstreetmap.josm.plugins.tofix.oauth.signpost.signature.SigningStrategy;
 
 public interface OAuthConsumer extends Serializable {

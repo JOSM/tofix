@@ -2,8 +2,8 @@ package org.openstreetmap.josm.plugins.tofix.oauth.signpost.signature;
 
 import java.io.Serializable;
 
-import org.openstreetmap.josm.plugins.tofix.oauth.signpost.http.HttpRequest;
 import org.openstreetmap.josm.plugins.tofix.oauth.signpost.http.HttpParameters;
+import org.openstreetmap.josm.plugins.tofix.oauth.signpost.http.HttpRequest;
 
 /**
  * <p>

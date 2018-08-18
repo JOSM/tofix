@@ -3,6 +3,7 @@ package org.openstreetmap.josm.plugins.tofix.util;
 import java.io.File;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
@@ -10,7 +11,7 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import org.openstreetmap.josm.Main;
+
 import org.openstreetmap.josm.tools.Logging;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -111,7 +112,7 @@ public class Config {
     }
 
     public static File getPreferencesDirectory() {
-        return Main.pref.getDirs().getPreferencesDirectory(false);
+        return org.openstreetmap.josm.spi.preferences.Config.getDirs().getPreferencesDirectory(false);
     }
 
     public static File getCacheDirectory() {

@@ -1,8 +1,10 @@
 package org.openstreetmap.josm.plugins.tofix;
 
+import static org.openstreetmap.josm.gui.mappaint.mapcss.ExpressionFactory.Functions.tr;
+
 import java.awt.Color;
 import java.awt.Component;
-import static org.openstreetmap.josm.gui.mappaint.mapcss.ExpressionFactory.Functions.tr;
+
 import org.openstreetmap.josm.gui.util.GuiHelper;
 import org.openstreetmap.josm.plugins.tofix.util.Config;
 import org.openstreetmap.josm.plugins.tofix.util.Status;

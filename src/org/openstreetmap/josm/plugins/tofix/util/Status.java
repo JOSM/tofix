@@ -1,11 +1,20 @@
 package org.openstreetmap.josm.plugins.tofix.util;
 
-import java.io.*;
-import java.net.*;
-import java.nio.charset.StandardCharsets;
-import java.util.logging.*;
-import javax.json.*;
 import static org.openstreetmap.josm.gui.mappaint.mapcss.ExpressionFactory.Functions.tr;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.StringReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonReader;
 
 import org.openstreetmap.josm.tools.HttpClient;
 import org.openstreetmap.josm.tools.Logging;

@@ -23,8 +23,8 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.openstreetmap.josm.plugins.tofix.oauth.signpost.OAuth;
 import org.openstreetmap.josm.plugins.tofix.oauth.signpost.exception.OAuthMessageSignerException;
-import org.openstreetmap.josm.plugins.tofix.oauth.signpost.http.HttpRequest;
 import org.openstreetmap.josm.plugins.tofix.oauth.signpost.http.HttpParameters;
+import org.openstreetmap.josm.plugins.tofix.oauth.signpost.http.HttpRequest;
 
 @SuppressWarnings("serial")
 public class HmacSha1MessageSigner extends OAuthMessageSigner {

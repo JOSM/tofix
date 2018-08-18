@@ -1,20 +1,40 @@
 package org.openstreetmap.josm.plugins.tofix.oauth;
-//<editor-fold defaultstate="collapsed" desc="Dependencias">
-import org.openstreetmap.josm.plugins.tofix.oauth.signpost.*;
-import java.io.*;
-import java.net.*;
-import java.nio.charset.Charset;
+import static org.openstreetmap.josm.tools.I18n.tr;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.StringReader;
+import java.net.CookieHandler;
+import java.net.HttpURLConnection;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
-import java.util.regex.*;
-import javax.json.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonReader;
+
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.io.OsmApi;
+//<editor-fold defaultstate="collapsed" desc="Dependencias">
+import org.openstreetmap.josm.plugins.tofix.oauth.signpost.OAuth;
+import org.openstreetmap.josm.plugins.tofix.oauth.signpost.OAuthConsumer;
+import org.openstreetmap.josm.plugins.tofix.oauth.signpost.OAuthProvider;
 import org.openstreetmap.josm.plugins.tofix.util.Config;
 import org.openstreetmap.josm.plugins.tofix.util.HttpClient;
 import org.openstreetmap.josm.tools.CheckParameterUtil;
-import static org.openstreetmap.josm.tools.I18n.tr;
-import org.openstreetmap.josm.tools.*;
+import org.openstreetmap.josm.tools.Logging;
+import org.openstreetmap.josm.tools.Utils;
 //</editor-fold>
 /**
  *

@@ -1,5 +1,7 @@
 package org.openstreetmap.josm.plugins.tofix;
 
+import static org.openstreetmap.josm.gui.mappaint.mapcss.ExpressionFactory.Functions.tr;
+
 import java.awt.GridLayout;
 import java.awt.Label;
 import java.awt.event.ActionEvent;
@@ -12,8 +14,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import javax.swing.AbstractAction;
-import static javax.swing.Action.NAME;
-import static javax.swing.Action.SHORT_DESCRIPTION;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -21,13 +21,13 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
-import org.openstreetmap.josm.Main;
 
 import org.openstreetmap.josm.actions.UploadAction;
 import org.openstreetmap.josm.data.Bounds;
 import org.openstreetmap.josm.data.ProjectionBounds;
 import org.openstreetmap.josm.data.coor.LatLon;
 import org.openstreetmap.josm.data.osm.DataSet;
+import org.openstreetmap.josm.data.projection.ProjectionRegistry;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.MapView;
 import org.openstreetmap.josm.gui.Notification;
@@ -36,11 +36,10 @@ import org.openstreetmap.josm.gui.dialogs.ToggleDialog;
 import org.openstreetmap.josm.gui.io.UploadDialog;
 import org.openstreetmap.josm.gui.layer.Layer;
 import org.openstreetmap.josm.gui.layer.OsmDataLayer;
-import static org.openstreetmap.josm.gui.mappaint.mapcss.ExpressionFactory.Functions.tr;
 import org.openstreetmap.josm.plugins.tofix.bean.AccessToProject;
+import org.openstreetmap.josm.plugins.tofix.bean.ItemBean;
 import org.openstreetmap.josm.plugins.tofix.bean.ListProjectBean;
 import org.openstreetmap.josm.plugins.tofix.bean.ProjectBean;
-import org.openstreetmap.josm.plugins.tofix.bean.ItemBean;
 import org.openstreetmap.josm.plugins.tofix.controller.ItemController;
 import org.openstreetmap.josm.plugins.tofix.controller.ItemTrackController;
 import org.openstreetmap.josm.plugins.tofix.controller.ListProjectsController;
@@ -176,8 +175,8 @@ public final class TofixDialog extends ToggleDialog implements ActionListener {
                 //get the editable bbox layer. 
                 if (layer.isSavable()) {
                     ProjectionBounds projectionBounds = layer.getViewProjectionBounds();
-                    LatLon minLatlon = Main.getProjection().eastNorth2latlon(projectionBounds.getMin());
-                    LatLon maxLatlon = Main.getProjection().eastNorth2latlon(projectionBounds.getMax());
+                    LatLon minLatlon = ProjectionRegistry.getProjection().eastNorth2latlon(projectionBounds.getMin());
+                    LatLon maxLatlon = ProjectionRegistry.getProjection().eastNorth2latlon(projectionBounds.getMax());
                     bounds = new Bounds(minLatlon, maxLatlon);
                 } else {
                     bounds = mv.getRealBounds();
@@ -260,8 +259,8 @@ public final class TofixDialog extends ToggleDialog implements ActionListener {
             skipButton, noterrorButton, fixedButton
         }));
 
-        oauth = new JDOAuth(Main.parent);
-        host = new JDHost(Main.parent);
+        oauth = new JDOAuth(MainApplication.getMainFrame());
+        host = new JDHost(MainApplication.getMainFrame());
         loadOAuthInfo();
 
     }
@@ -298,7 +297,7 @@ public final class TofixDialog extends ToggleDialog implements ActionListener {
                 fillCombo();
             }
         } else {
-            JOptionPane.showMessageDialog(Main.parent, tr("API did not response! ") + Config.getHOST());
+            JOptionPane.showMessageDialog(MainApplication.getMainFrame(), tr("API did not response! ") + Config.getHOST());
         }
 
     }
@@ -428,7 +427,7 @@ public final class TofixDialog extends ToggleDialog implements ActionListener {
                 edit();
                 break;
             case 410:
-                JOptionPane.showMessageDialog(Main.parent, tr("There are no more items on this Project or Area!"), tr("Warning"), JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(MainApplication.getMainFrame(), tr("There are no more items on this Project or Area!"), tr("Warning"), JOptionPane.WARNING_MESSAGE);
                 mainAccessToProject.setAccess(false);
                 break;
             default:

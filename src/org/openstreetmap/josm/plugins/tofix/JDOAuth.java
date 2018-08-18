@@ -1,14 +1,17 @@
 package org.openstreetmap.josm.plugins.tofix;
 
-import java.awt.Component;
-import javax.swing.JOptionPane;
-import javax.json.*;
-import org.openstreetmap.josm.gui.util.GuiHelper;
 import static org.openstreetmap.josm.tools.I18n.tr;
-import org.openstreetmap.josm.tools.Logging;
-import org.openstreetmap.josm.plugins.tofix.oauth.OAuthToken;
+
+import java.awt.Component;
+
+import javax.json.JsonObject;
+import javax.swing.JOptionPane;
+
+import org.openstreetmap.josm.gui.util.GuiHelper;
 import org.openstreetmap.josm.plugins.tofix.oauth.OAuthClient;
+import org.openstreetmap.josm.plugins.tofix.oauth.OAuthToken;
 import org.openstreetmap.josm.plugins.tofix.oauth.SessionId;
+import org.openstreetmap.josm.tools.Logging;
 
 /**
  *

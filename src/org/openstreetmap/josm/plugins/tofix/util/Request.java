@@ -3,6 +3,7 @@ package org.openstreetmap.josm.plugins.tofix.util;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+
 import org.openstreetmap.josm.tools.HttpClient;
 import org.openstreetmap.josm.tools.HttpClient.Response;
 
