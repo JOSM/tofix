@@ -24,8 +24,6 @@ import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
 
-import org.openstreetmap.josm.Main;
-import org.openstreetmap.josm.io.OsmApi;
 //<editor-fold defaultstate="collapsed" desc="Dependencias">
 import org.openstreetmap.josm.plugins.tofix.oauth.signpost.OAuth;
 import org.openstreetmap.josm.plugins.tofix.oauth.signpost.OAuthConsumer;
@@ -42,8 +40,8 @@ import org.openstreetmap.josm.tools.Utils;
  */
 public class OAuthClient {
     //<editor-fold defaultstate="collapsed" desc="Variable">
-    static String API_URL = OsmApi.DEFAULT_API_URL;
-    static String OSM_WEBSITE = Main.getOSMWebsite();
+    static String API_URL = org.openstreetmap.josm.spi.preferences.Config.getUrls().getDefaultOsmApiUrl();
+    static String OSM_WEBSITE = org.openstreetmap.josm.spi.preferences.Config.getUrls().getOSMWebsite();
 
     private OAuthParameters oauthProviderParameters;
     private OAuthConsumer consumer;
@@ -427,7 +425,7 @@ public class OAuthClient {
                 try {
                     reader.close();
                 } catch (IOException ioe) {
-                    ioe.printStackTrace();
+                    Logging.error(ioe);
                 }
             }
         }
@@ -490,7 +488,7 @@ public class OAuthClient {
                 try {
                     reader.close();
                 } catch (IOException ioe) {
-                    ioe.printStackTrace();
+                    Logging.error(ioe);
                 }
             }
         }
