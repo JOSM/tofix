@@ -46,7 +46,7 @@ public abstract class AbstractOAuthProvider implements OAuthProvider {
         this.accessTokenEndpointUrl = accessTokenEndpointUrl;
         this.authorizationWebsiteUrl = authorizationWebsiteUrl;
         this.responseParameters = new HttpParameters();
-        this.defaultHeaders = new HashMap<String, String>();
+        this.defaultHeaders = new HashMap<>();
     }
 
     @Override
@@ -102,7 +102,6 @@ public abstract class AbstractOAuthProvider implements OAuthProvider {
         retrieveToken(consumer, accessTokenEndpointUrl, params);
     }
 
-    @SuppressWarnings("Finally")
     protected void retrieveToken(OAuthConsumer consumer, String endpointUrl,
             HttpParameters customOAuthParams) throws OAuthMessageSignerException,
             OAuthCommunicationException, OAuthNotAuthorizedException,
@@ -251,12 +250,12 @@ public abstract class AbstractOAuthProvider implements OAuthProvider {
         return this.authorizationWebsiteUrl;
     }
 
-    @Override @SuppressWarnings("deprecation")
+    @Override
     public void setRequestHeader(String header, String value) {
         defaultHeaders.put(header, value);
     }
 
-    @Override @SuppressWarnings("deprecation")
+    @Override
     public Map<String, String> getRequestHeaders() {
         return defaultHeaders;
     }

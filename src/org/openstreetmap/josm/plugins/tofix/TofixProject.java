@@ -3,7 +3,6 @@ package org.openstreetmap.josm.plugins.tofix;
 import static org.openstreetmap.josm.gui.mappaint.mapcss.ExpressionFactory.Functions.tr;
 
 import org.geojson.GeoJsonObject;
-import org.geojson.GeometryCollection;
 import org.openstreetmap.josm.data.Bounds;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.MapView;
@@ -39,7 +38,6 @@ public class TofixProject {
             final ObjectMapper mapper = new ObjectMapper();
             mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             final GeoJsonObject object = mapper.readValue(item.getFeatureCollection().toString(), GeoJsonObject.class);
-            GeoJsonObject geoJsonObject = new GeometryCollection();
             final BoundedDataSet data = new DataSetBuilder().build(object);
             //set layer  name
             if (isCheckedEditableData) {

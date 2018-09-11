@@ -12,7 +12,9 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 import org.openstreetmap.josm.actions.AutoScaleAction;
+import org.openstreetmap.josm.actions.AutoScaleAction.AutoScaleMode;
 import org.openstreetmap.josm.actions.downloadtasks.DownloadOsmTask;
+import org.openstreetmap.josm.actions.downloadtasks.DownloadParams;
 import org.openstreetmap.josm.data.Bounds;
 import org.openstreetmap.josm.data.osm.BBox;
 import org.openstreetmap.josm.data.osm.DataSet;
@@ -43,7 +45,7 @@ public class Download {
             JOptionPane.showMessageDialog(MainApplication.getMainFrame(), tr("This big area cannot be downloaded!"), tr("Warning"), JOptionPane.WARNING_MESSAGE);
             return;
         }
-        final Future<?> future = task.download(true, bounds, monitor);
+        final Future<?> future = task.download(new DownloadParams().withNewLayer(true), bounds, monitor);
         Runnable runAfterTask;
 
         if (osm_obj_id != null) {
@@ -77,7 +79,7 @@ public class Download {
                                     dataset.setSelected(selection);
                                 }
                                 if (!selection.isEmpty()) {
-                                    AutoScaleAction.autoScale("selection");
+                                    AutoScaleAction.autoScale(AutoScaleMode.SELECTION);
                                 }
                             }
                         }
