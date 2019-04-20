@@ -7,9 +7,9 @@ import java.awt.Component;
 import javax.json.JsonObject;
 import javax.swing.JOptionPane;
 
+import org.openstreetmap.josm.data.oauth.OAuthToken;
 import org.openstreetmap.josm.gui.util.GuiHelper;
 import org.openstreetmap.josm.plugins.tofix.oauth.OAuthClient;
-import org.openstreetmap.josm.plugins.tofix.oauth.OAuthToken;
 import org.openstreetmap.josm.plugins.tofix.oauth.SessionId;
 import org.openstreetmap.josm.tools.Logging;
 
@@ -33,7 +33,6 @@ public class JDOAuth extends javax.swing.JDialog {
         setLocationRelativeTo(parent);
     }
 
-    @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
@@ -62,12 +61,7 @@ public class JDOAuth extends javax.swing.JDialog {
         jTabbedPane1.setEnabled(false);
 
         jButton1.setText("Autorize now");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-	    @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
+        jButton1.addActionListener(evt -> jButton1ActionPerformed());
 
         jLabel2.setText("Username:");
 
@@ -75,12 +69,7 @@ public class JDOAuth extends javax.swing.JDialog {
 
         jTextField1.setEditable(false);
 
-        jPasswordField1.addActionListener(new java.awt.event.ActionListener() {
-	    @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jPasswordField1ActionPerformed(evt);
-            }
-        });
+        jPasswordField1.addActionListener(evt -> jPasswordField1ActionPerformed());
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -130,20 +119,10 @@ public class JDOAuth extends javax.swing.JDialog {
         jScrollPane1.setViewportView(jTextArea1);
 
         jButton2.setText("Generate New Access Token");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
-            }
-        });
+        jButton2.addActionListener(evt -> jButton2ActionPerformed());
 
         jButton3.setText("Ok");
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
-            }
-        });
+        jButton3.addActionListener(evt -> jButton3ActionPerformed());
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -197,21 +176,21 @@ public class JDOAuth extends javax.swing.JDialog {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void jButton1ActionPerformed() {//GEN-FIRST:event_jButton1ActionPerformed
         autenticationOSM();
     }//GEN-LAST:event_jButton1ActionPerformed
 
-    private void jPasswordField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jPasswordField1ActionPerformed
+    private void jPasswordField1ActionPerformed() {//GEN-FIRST:event_jPasswordField1ActionPerformed
         jButton1.doClick();
     }//GEN-LAST:event_jPasswordField1ActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    private void jButton2ActionPerformed() {//GEN-FIRST:event_jButton2ActionPerformed
         jPasswordField1.setText("");
         jTextArea1.setText("");
         jTabbedPane1.setSelectedIndex(0);
     }//GEN-LAST:event_jButton2ActionPerformed
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+    private void jButton3ActionPerformed() {//GEN-FIRST:event_jButton3ActionPerformed
         dispose();
     }//GEN-LAST:event_jButton3ActionPerformed
 

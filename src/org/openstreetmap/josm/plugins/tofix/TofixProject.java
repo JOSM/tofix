@@ -2,23 +2,22 @@ package org.openstreetmap.josm.plugins.tofix;
 
 import static org.openstreetmap.josm.gui.mappaint.mapcss.ExpressionFactory.Functions.tr;
 
-import org.geojson.GeoJsonObject;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+
 import org.openstreetmap.josm.data.Bounds;
+import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.gui.MainApplication;
-import org.openstreetmap.josm.gui.MapView;
 import org.openstreetmap.josm.gui.io.UploadDialog;
 import org.openstreetmap.josm.gui.layer.Layer;
-import org.openstreetmap.josm.plugins.geojson.DataSetBuilder;
-import org.openstreetmap.josm.plugins.geojson.DataSetBuilder.BoundedDataSet;
+import org.openstreetmap.josm.gui.progress.NullProgressMonitor;
 import org.openstreetmap.josm.plugins.geojson.GeoJsonLayer;
+import org.openstreetmap.josm.plugins.geojson.GeoJsonReader;
 import org.openstreetmap.josm.plugins.tofix.bean.AccessToProject;
 import org.openstreetmap.josm.plugins.tofix.bean.ItemBean;
-import org.openstreetmap.josm.plugins.tofix.controller.ItemController;
 import org.openstreetmap.josm.plugins.tofix.util.Download;
 import org.openstreetmap.josm.tools.Logging;
-
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  *
@@ -26,22 +25,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class TofixProject {
 
-    ItemController itemController = new ItemController();
-    Bounds bounds = null;
-    Bounds bounds_default = null;
-    DataSetBuilder dataSetBuilder = new DataSetBuilder();
-    MapView mv = null;
     TofixNewLayer tofixLayer = new TofixNewLayer(tr("Tofix:<Layer>"));
 
     public AccessToProject work(ItemBean item, AccessToProject accessToTask, double downloadSize, boolean isCheckedDownloadOSMData, boolean isCheckedEditableData) {
-        try {
-            final ObjectMapper mapper = new ObjectMapper();
-            mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-            final GeoJsonObject object = mapper.readValue(item.getFeatureCollection().toString(), GeoJsonObject.class);
-            final BoundedDataSet data = new DataSetBuilder().build(object);
+        try (InputStream in = new ByteArrayInputStream(
+        		item.getFeatureCollection().toString().getBytes(StandardCharsets.UTF_8))) {
+            final DataSet data = GeoJsonReader.parseDataSet(in, NullProgressMonitor.INSTANCE);
+            final Bounds bounds = new Bounds();
+            data.getDataSourceBounds().forEach(bounds::extend);
             //set layer  name
             if (isCheckedEditableData) {
-                final Layer layer = new GeoJsonLayer(tr("Tofix:editable") + accessToTask.getProject_name()+"-" + item.getId(), data);
+                final Layer layer = new GeoJsonLayer(tr("Tofix:editable") + accessToTask.getProject_name()+"-" + item.getId(), data, bounds);
                 layer.setBackgroundLayer(true);
                 MainApplication.getLayerManager().addLayer(layer);
             } else {
@@ -50,7 +44,7 @@ public class TofixProject {
                 TofixDraw.draw(tofixLayer, data);
             }
             if (isCheckedDownloadOSMData) {
-                Download.download(data.getBounds(), 0L, downloadSize);
+                Download.download(bounds, 0L, downloadSize);
             }
         } catch (final Exception e) {
             Logging.error("Error while reading json file!");

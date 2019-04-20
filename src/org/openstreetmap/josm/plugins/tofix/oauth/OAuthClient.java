@@ -24,15 +24,19 @@ import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
 
+import org.openstreetmap.josm.data.oauth.OAuthParameters;
+import org.openstreetmap.josm.data.oauth.OAuthToken;
+import org.openstreetmap.josm.data.oauth.OsmPrivileges;
 //<editor-fold defaultstate="collapsed" desc="Dependencias">
-import org.openstreetmap.josm.plugins.tofix.oauth.signpost.OAuth;
-import org.openstreetmap.josm.plugins.tofix.oauth.signpost.OAuthConsumer;
-import org.openstreetmap.josm.plugins.tofix.oauth.signpost.OAuthProvider;
 import org.openstreetmap.josm.plugins.tofix.util.Config;
 import org.openstreetmap.josm.plugins.tofix.util.HttpClient;
 import org.openstreetmap.josm.tools.CheckParameterUtil;
 import org.openstreetmap.josm.tools.Logging;
 import org.openstreetmap.josm.tools.Utils;
+
+import oauth.signpost.OAuth;
+import oauth.signpost.OAuthConsumer;
+import oauth.signpost.OAuthProvider;
 //</editor-fold>
 /**
  *

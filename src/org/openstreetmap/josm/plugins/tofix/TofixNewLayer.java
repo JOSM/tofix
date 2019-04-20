@@ -27,14 +27,11 @@ import org.openstreetmap.josm.gui.MapView;
 import org.openstreetmap.josm.gui.dialogs.LayerListDialog;
 import org.openstreetmap.josm.gui.dialogs.LayerListPopup;
 import org.openstreetmap.josm.gui.layer.Layer;
-import org.openstreetmap.josm.plugins.geojson.DataSetBuilder.BoundedDataSet;
 import org.openstreetmap.josm.tools.ImageProvider;
 
 public class TofixNewLayer extends Layer implements ActionListener {
 
-    BoundedDataSet boundedDataSet;
-
-//    DataSet dataset;
+    DataSet dataset;
     float width;
 
     public TofixNewLayer(String name) {
@@ -56,14 +53,13 @@ public class TofixNewLayer extends Layer implements ActionListener {
         return false;
     }
 
-    public void setBoundedDataSet(BoundedDataSet boundedDataSet) {
-        this.boundedDataSet = boundedDataSet;
+    public void setDataSet(DataSet dataset) {
+        this.dataset = dataset;
         invalidate();
     }
 
     @Override
     public void paint(Graphics2D g, final MapView mv, Bounds bounds) {
-        DataSet dataset = boundedDataSet.getDataSet();
         Stroke stroke = g.getStroke();
         if (dataset == null) {
             return;
