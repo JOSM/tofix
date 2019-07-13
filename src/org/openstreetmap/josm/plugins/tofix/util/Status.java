@@ -1,6 +1,6 @@
 package org.openstreetmap.josm.plugins.tofix.util;
 
-import static org.openstreetmap.josm.gui.mappaint.mapcss.ExpressionFactory.Functions.tr;
+import static org.openstreetmap.josm.tools.I18n.tr;
 
 import java.io.BufferedReader;
 import java.io.IOException;
