@@ -11,9 +11,9 @@ import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.io.UploadDialog;
 import org.openstreetmap.josm.gui.layer.Layer;
+import org.openstreetmap.josm.gui.layer.OsmDataLayer;
 import org.openstreetmap.josm.gui.progress.NullProgressMonitor;
-import org.openstreetmap.josm.plugins.geojson.GeoJsonLayer;
-import org.openstreetmap.josm.plugins.geojson.GeoJsonReader;
+import org.openstreetmap.josm.io.GeoJSONReader;
 import org.openstreetmap.josm.plugins.tofix.bean.AccessToProject;
 import org.openstreetmap.josm.plugins.tofix.bean.ItemBean;
 import org.openstreetmap.josm.plugins.tofix.util.Download;
@@ -30,12 +30,11 @@ public class TofixProject {
     public AccessToProject work(ItemBean item, AccessToProject accessToTask, double downloadSize, boolean isCheckedDownloadOSMData, boolean isCheckedEditableData) {
         try (InputStream in = new ByteArrayInputStream(
         		item.getFeatureCollection().toString().getBytes(StandardCharsets.UTF_8))) {
-            final DataSet data = GeoJsonReader.parseDataSet(in, NullProgressMonitor.INSTANCE);
+            final DataSet data = GeoJSONReader.parseDataSet(in, NullProgressMonitor.INSTANCE);
             final Bounds bounds = new Bounds();
             data.getDataSourceBounds().forEach(bounds::extend);
-            //set layer  name
             if (isCheckedEditableData) {
-                final Layer layer = new GeoJsonLayer(tr("Tofix:editable") + accessToTask.getProject_name()+"-" + item.getId(), data, bounds);
+                final Layer layer = new OsmDataLayer(data, tr("Tofix:editable") + accessToTask.getProject_name()+"-" + item.getId(), null);
                 layer.setBackgroundLayer(true);
                 MainApplication.getLayerManager().addLayer(layer);
             } else {
