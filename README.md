@@ -1,4 +1,8 @@
 # Tofix Plugin for JOSM
+## 💥💥💥💥 The to-fix server is no longer [maintained](https://github.com/osmlab/to-fix/issues/227). 💥💥💥💥
+This plugin has therefore been archived and has been marked as deprecated in JOSM.
+
+----
 
 This plugin makes [To-Fix](http://osmlab.github.io/to-fix) OpenStreetMap microtasking challenges available directly from within the [JOSM](https://josm.openstreetmap.de/) editor.
 
