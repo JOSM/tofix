@@ -4,7 +4,7 @@ import static org.openstreetmap.josm.tools.I18n.tr;
 
 import java.awt.Component;
 
-import javax.json.JsonObject;
+import jakarta.json.JsonObject;
 import javax.swing.JOptionPane;
 
 import org.openstreetmap.josm.data.oauth.OAuthToken;
